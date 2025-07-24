@@ -113,22 +113,20 @@ module Hecate::Core
     
     private def compute_line_offsets(text : String) : Array(Int32)
       offsets = [0]
-      idx = 0
+      byte_index = 0
       
-      while idx < text.bytesize
-        char = text[idx]
+      text.each_byte do |byte|
+        byte_index += 1
         
-        if char == '\n'
-          offsets << idx + 1
-        elsif char == '\r'
+        if byte == '\n'.ord
+          offsets << byte_index
+        elsif byte == '\r'.ord
           # Check if it's followed by \n (CRLF)
-          if idx + 1 < text.bytesize && text[idx + 1] == '\n'
-            idx += 1  # Skip the \n, we'll handle it as part of CRLF
+          if byte_index < text.bytesize && text.byte_at?(byte_index) == '\n'.ord
+            byte_index += 1  # Skip the \n, we'll handle it as part of CRLF
           end
-          offsets << idx + 1
+          offsets << byte_index
         end
-        
-        idx += 1
       end
       
       offsets

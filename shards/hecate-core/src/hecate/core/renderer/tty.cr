@@ -24,6 +24,11 @@ module Hecate::Core
       diagnostic.notes.each { |note| emit_note(note) }
     end
     
+    # Overload to accept DiagnosticBuilder
+    def emit(diagnostic_builder : DiagnosticBuilder, source_map : SourceMap)
+      emit(diagnostic_builder.build, source_map)
+    end
+    
     private def emit_header(diagnostic)
       severity_text = case diagnostic.severity
       when .error? then "error"

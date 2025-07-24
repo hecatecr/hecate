@@ -31,6 +31,35 @@ hecate/
 - Dependencies flow downward only (no cycles)
 - Each shard is independently versioned and published
 
+#### Local Development Dependencies
+For local development, internal shard dependencies should be declared in `shard.yml` using path references:
+
+```yaml
+# In shards/hecate-lex/shard.yml
+dependencies:
+  hecate-core:
+    path: ../hecate-core
+```
+
+This allows you to require dependencies normally:
+```crystal
+# In specs or source files
+require "hecate-core"
+require "hecate-core/test_utils"  # Instead of relative paths
+```
+
+**Never use relative paths** like `require "../../hecate-core/src/..."` in specs or source. Always declare the dependency in shard.yml and require by shard name.
+
+#### Test Utilities
+For enhanced testing capabilities, require the test utils from hecate-core:
+```crystal
+# In spec files
+require "./spec_helper"
+require "hecate-core/test_utils"  # Provides snapshot testing, custom matchers, etc.
+```
+
+**Test Utils Structure**: Test utilities are exposed via `src/test_utils.cr` in hecate-core, which requires the internal test utilities and makes helper methods available.
+
 ## Key Commands
 
 ### Development Setup
@@ -93,10 +122,28 @@ crystal build --release src/<shard-name>.cr
 - Version constant in each module: `VERSION = "x.y.z"`
 
 ### File Organization
-- Main entry point: `src/<shard-name>.cr`
-- Sub-modules in `src/<shard-name>/` directory
-- Specs mirror source structure in `spec/`
-- Each spec requires `spec_helper.cr`
+**IMPORTANT**: Follow this exact directory structure for all shards:
+
+```
+shards/hecate-[name]/
+  src/
+    hecate-[name].cr          # Main entry point
+    hecate/
+      [name]/                 # Module files go here
+        *.cr
+  spec/
+    hecate/
+      [name]/                 # Specs mirror src structure
+        *_spec.cr
+    spec_helper.cr
+```
+
+Examples:
+- `hecate-core/src/hecate/core/span.cr` → `module Hecate::Core`
+- `hecate-lex/src/hecate/lex/lexer.cr` → `module Hecate::Lex`
+- `hecate-parse/src/hecate/parse/parser.cr` → `module Hecate::Parse`
+
+**Never create `src/hecate-[name]/`** - the directory under src should be `hecate/[name]/`
 
 ### Error Handling
 - All phases return `{result, diagnostics : Array(Diagnostic)}`

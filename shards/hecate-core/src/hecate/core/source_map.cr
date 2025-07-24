@@ -61,7 +61,7 @@ module Hecate::Core
     end
 
     # Iterate over all source files
-    def each_source(&block : SourceFile ->)
+    def each_source(& : SourceFile ->)
       mutex.synchronize do
         sources.each_value { |source| yield source }
       end

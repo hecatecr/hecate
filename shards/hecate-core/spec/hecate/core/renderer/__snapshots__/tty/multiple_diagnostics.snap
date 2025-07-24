@@ -1,0 +1,29 @@
+error: undefined is not a value
+  --> multiple.cr:2:11
+  |
+1 | fn main() {
+2 |   let x = undefined;
+  |           ^^^^^^^^^ not defined
+3 |   let y = x + 1;
+4 |   print(z);
+  |
+warning: potential null reference
+  --> multiple.cr:3:9
+  |
+1 | fn main() {
+2 |   let x = undefined;
+3 |   let y = x + 1;
+  |         ^ x might be null
+4 |   print(z);
+5 | }
+  |
+error: undefined variable
+  --> multiple.cr:4:8
+  |
+2 |   let x = undefined;
+3 |   let y = x + 1;
+4 |   print(z);
+  |        ^ z is not defined
+5 | }
+  |
+help: did you mean 'x' or 'y'?

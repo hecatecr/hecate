@@ -1,0 +1,7 @@
+error: undefined variable
+  --> simple.cr:1:5
+  |
+1 | let x = 42;
+  |     ^ not found
+2 | let y = x + 1;
+  |

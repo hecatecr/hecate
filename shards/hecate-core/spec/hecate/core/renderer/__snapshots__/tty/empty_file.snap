@@ -1,0 +1,6 @@
+error: empty file
+  --> empty.cr:1:1
+  |
+1 | 
+  | ^ file is empty
+  |

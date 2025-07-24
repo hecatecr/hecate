@@ -1,0 +1,34 @@
+# Token Sequence Golden File
+# Format: TYPE:"lexeme"@start:end
+
+Identifier:"if"@0:2
+LeftParen:"("@3:4
+Identifier:"condition"@4:13
+RightParen:")"@13:14
+LeftBrace:"{"@15:16
+Identifier:"let"@19:22
+Identifier:"counter"@23:30
+Equal:"="@31:32
+Integer:"0"@33:34
+Semicolon:";"@34:35
+Identifier:"while"@38:43
+LeftParen:"("@44:45
+Identifier:"counter"@45:52
+Less:"<"@53:54
+Integer:"10"@55:57
+RightParen:")"@57:58
+LeftBrace:"{"@59:60
+Identifier:"counter"@65:72
+Equal:"="@73:74
+Identifier:"counter"@75:82
+Plus:"+"@83:84
+Integer:"1"@85:86
+Semicolon:";"@86:87
+RightBrace:"}"@90:91
+RightBrace:"}"@92:93
+Identifier:"else"@94:98
+LeftBrace:"{"@99:100
+Identifier:"return"@103:109
+Identifier:"false"@110:115
+Semicolon:";"@115:116
+RightBrace:"}"@117:118

@@ -1,0 +1,9 @@
+info: syntax suggestion
+  --> help.cr:1:5
+  |
+1 | let x = 42;
+  |     ^ consider renaming
+  |
+help: try using a more descriptive name
+note: descriptive names improve code readability
+note: avoid single-letter variables in production code

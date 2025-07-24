@@ -1,0 +1,7 @@
+# Token Sequence Golden File
+# Format: TYPE:"lexeme"@start:end
+
+Word:"hello"@0:5
+Word:"world"@10:15
+Number:"123"@16:19
+Word:"test"@24:28

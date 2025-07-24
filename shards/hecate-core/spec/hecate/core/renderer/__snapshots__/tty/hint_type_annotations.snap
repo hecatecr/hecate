@@ -1,0 +1,9 @@
+hint: type annotations missing
+  --> hint.cr:1:9
+  |
+1 | def add(a, b)
+  |         ^^^^^ parameters lack type annotations
+2 |   a + b
+3 | end
+  |
+help: add type annotations for better type safety

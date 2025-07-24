@@ -1,0 +1,34 @@
+error: this is an error
+  --> severity.cr:1:4
+  |
+1 | // Error line
+  |    ^^^^^ error here
+2 | // Warning line
+3 | // Info line
+  |
+warning: this is a warning
+  --> severity.cr:2:4
+  |
+1 | // Error line
+2 | // Warning line
+  |    ^^^^^^^ warning here
+3 | // Info line
+4 | // Hint line
+  |
+info: this is info
+  --> severity.cr:3:4
+  |
+1 | // Error line
+2 | // Warning line
+3 | // Info line
+  |    ^^^^ info here
+4 | // Hint line
+  |
+hint: this is a hint
+  --> severity.cr:4:5
+  |
+2 | // Warning line
+3 | // Info line
+4 | // Hint line
+  |     ^^^^ hint here
+  |

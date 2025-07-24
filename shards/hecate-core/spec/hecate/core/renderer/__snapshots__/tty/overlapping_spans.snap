@@ -1,0 +1,7 @@
+warning: naming conventions
+  --> overlap.cr:1:5
+  |
+1 | let very_long_variable_name = compute_value();
+  |     ^^^^^^^^^^^^^^^^^^^ snake_case preferred
+  |               ~~~~~~~~~~~~~ too verbose
+  |

@@ -1,0 +1,18 @@
+# Token Sequence Golden File
+# Format: TYPE:"lexeme"@start:end
+
+LeftBracket:"["@0:1
+String:"\"hello\""@1:8
+Comma:","@8:9
+Number:"42"@10:12
+Comma:","@12:13
+True:"true"@14:18
+Comma:","@18:19
+Null:"null"@20:24
+Comma:","@24:25
+LeftBrace:"{"@26:27
+String:"\"nested\""@27:35
+Colon:":"@35:36
+String:"\"value\""@37:44
+RightBrace:"}"@44:45
+RightBracket:"]"@45:46

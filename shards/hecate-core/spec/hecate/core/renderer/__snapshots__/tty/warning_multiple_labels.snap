@@ -1,0 +1,9 @@
+warning: unused variables
+  --> multi.cr:1:5
+  |
+1 | let x = 42;
+  |     ^ first unused
+2 | let y = x + 1;
+  |     ~ also unused
+3 | let z = y * 2;
+  |

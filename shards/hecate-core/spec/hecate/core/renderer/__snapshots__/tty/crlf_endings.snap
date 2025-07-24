@@ -1,0 +1,8 @@
+error: line ending issue
+  --> crlf.cr:2:1
+  |
+1 | line one
+2 | line two
+  | ^^^^^^^^ second line
+3 | line three
+  |

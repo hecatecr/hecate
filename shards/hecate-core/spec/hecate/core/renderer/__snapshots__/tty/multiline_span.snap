@@ -1,0 +1,12 @@
+error: missing error handling
+  --> multiline.cr:2:2
+  |
+1 | def process
+2 |   start_transaction
+  |  ^^^^^^^^^^^^^^^^^^ transaction not properly wrapped
+3 |   do_work
+  | ^^^^^^^^ transaction not properly wrapped
+4 |   commit
+5 | end
+  |
+help: wrap in begin/rescue block

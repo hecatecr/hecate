@@ -1,0 +1,9 @@
+info: unicode identifiers
+  --> unicode.cr:1:5
+  |
+1 | let café = "☕";
+let
+  |     ^^^^ non-ASCII identifier
+2 |  数値 = 42;
+  | ~~~~ also non-ASCII
+  |

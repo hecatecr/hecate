@@ -1,0 +1,25 @@
+error: related errors
+  --> distant.cr:4:4
+   |
+ 2 | // Line 02: code here
+ 3 | // Line 03: code here
+ 4 | // Line 04: code here
+   |    ^^^^^^^ first issue here
+ 5 | // Line 05: code here
+ 6 | // Line 06: code here
+ 7 | // Line 07: code here
+ 8 | // Line 08: code here
+ 9 | // Line 09: code here
+10 | // Line 10: code here
+11 | // Line 11: code here
+12 | // Line 12: code here
+13 | // Line 13: code here
+14 | // Line 14: code here
+15 | // Line 15: code here
+16 | // Line 16: code here
+17 | // Line 17: code here
+18 | // Line 18: code here
+   |    ~~~~~~~ caused by this
+19 | // Line 19: code here
+20 | // Line 20: code here
+   |

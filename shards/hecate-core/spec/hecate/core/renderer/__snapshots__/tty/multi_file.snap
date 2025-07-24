@@ -1,0 +1,16 @@
+error: undefined method 'undefined_method'
+  --> helper.cr:2:5
+  |
+1 | def helper_function
+2 |   undefined_method()
+  |     ^^^^^^^^^^^^^^^^ method not found
+3 | end
+  |
+  --> main.cr:3:1
+  |
+1 | require "./helper"
+2 | 
+3 | helper_function()
+  | ~~~~~~~~~~~~~~~ called from here
+  |
+help: did you forget to define this method?

@@ -1,0 +1,16 @@
+# Token Sequence Golden File
+# Format: TYPE:"lexeme"@start:end
+
+LeftBrace:"{"@0:1
+String:"\"name\""@4:10
+Colon:":"@10:11
+String:"\"John\""@12:18
+Comma:","@18:19
+String:"\"age\""@22:27
+Colon:":"@27:28
+Number:"30"@29:31
+Comma:","@31:32
+String:"\"active\""@35:43
+Colon:":"@43:44
+True:"true"@45:49
+RightBrace:"}"@50:51

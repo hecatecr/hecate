@@ -1,0 +1,6 @@
+error: undefined variable 'error'
+  --> nocolor.cr:1:9
+  |
+1 | let x = error;
+  |         ^^^^^ not defined
+  |

@@ -78,17 +78,32 @@ module Hecate::Core
       if line_number == line_offsets.size - 1
         line_text = contents[line_start..]
       else
-        line_end = line_offsets[line_number + 1] - 1  # Exclude the newline
+        line_end = line_offsets[line_number + 1]
         
-        # Also exclude \r if it's a CRLF ending
-        if line_end > line_start && contents[line_end - 1] == '\r'
-          line_end -= 1
+        # Find the actual end of the line content (before any line endings)
+        actual_end = line_end - 1
+        
+        # Check for line ending characters and move back
+        if actual_end >= line_start && contents[actual_end] == '\n'
+          actual_end -= 1
+          # Check for CRLF
+          if actual_end >= line_start && contents[actual_end] == '\r'
+            actual_end -= 1
+          end
+        elsif actual_end >= line_start && contents[actual_end] == '\r'
+          # Lone CR
+          actual_end -= 1
         end
         
-        line_text = contents[line_start...line_end]
+        # Extract the line content
+        if actual_end >= line_start
+          line_text = contents[line_start..actual_end]
+        else
+          line_text = ""
+        end
       end
       
-      # Remove any remaining line ending characters
+      # Remove any remaining line ending characters (for the last line)
       line_text.chomp
     end
     
@@ -115,17 +130,21 @@ module Hecate::Core
       offsets = [0]
       byte_index = 0
       
-      text.each_byte do |byte|
-        byte_index += 1
+      while byte_index < text.bytesize
+        byte = text.byte_at(byte_index)
         
         if byte == '\n'.ord
+          byte_index += 1
           offsets << byte_index
         elsif byte == '\r'.ord
+          byte_index += 1
           # Check if it's followed by \n (CRLF)
-          if byte_index < text.bytesize && text.byte_at?(byte_index) == '\n'.ord
+          if byte_index < text.bytesize && text.byte_at(byte_index) == '\n'.ord
             byte_index += 1  # Skip the \n, we'll handle it as part of CRLF
           end
           offsets << byte_index
+        else
+          byte_index += 1
         end
       end
       

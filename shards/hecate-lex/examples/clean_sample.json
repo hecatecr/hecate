@@ -1,0 +1,47 @@
+{
+  "name": "Hecate Lexer Toolkit",
+  "version": "0.1.0",
+  "description": "A powerful lexer generation toolkit for Crystal",
+  "features": [
+    "Dynamic token generation",
+    "Typed lexer support",
+    "Longest-match-wins algorithm",
+    "Comprehensive error handling"
+  ],
+  "performance": {
+    "tokensPerSecond": 2890,
+    "target": 100000,
+    "optimized": true
+  },
+  "examples": [
+    {
+      "name": "Mini JavaScript",
+      "fileTypes": [".js", ".mjs"],
+      "keywords": 12,
+      "operators": 17
+    },
+    {
+      "name": "JSON",
+      "fileTypes": [".json"],
+      "supportsComments": false,
+      "strictMode": true
+    }
+  ],
+  "author": {
+    "name": "watzon",
+    "github": "https://github.com/watzon"
+  },
+  "license": "MIT",
+  "numbers": {
+    "integer": 42,
+    "negative": -17,
+    "float": 3.14159,
+    "scientific": 6.022e23,
+    "small": 1.0e-10
+  },
+  "booleans": {
+    "truthValue": true,
+    "falseValue": false,
+    "nullValue": null
+  }
+}

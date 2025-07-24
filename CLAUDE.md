@@ -114,6 +114,23 @@ crystal build src/<shard-name>.cr
 crystal build --release src/<shard-name>.cr
 ```
 
+### Running Examples
+**IMPORTANT**: Always run examples from the shard's root directory, not from the monorepo root or the examples directory itself.
+
+```bash
+# CORRECT: Run from the shard's root directory
+cd shards/hecate-lex
+crystal run examples/json_lexer.cr -- examples/sample.json
+
+# WRONG: Don't run from monorepo root
+# crystal run shards/hecate-lex/examples/json_lexer.cr
+
+# WRONG: Don't run from examples directory
+# cd shards/hecate-lex/examples && crystal run json_lexer.cr
+```
+
+This ensures proper dependency resolution and path handling.
+
 ## Crystal Conventions for This Project
 
 ### Module Structure

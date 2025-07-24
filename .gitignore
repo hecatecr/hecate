@@ -1,0 +1,51 @@
+# Crystal
+/lib/
+/bin/
+/.shards/
+*.dwarf
+/docs/
+/.crystal/
+shard.lock
+
+# Build artifacts
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Test coverage
+/coverage/
+
+# Benchmarks
+/benchmarks/results/
+
+# Temporary files
+*.tmp
+.cache/
+
+# Environment
+.env
+.env.local
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

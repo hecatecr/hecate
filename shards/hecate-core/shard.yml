@@ -1,0 +1,13 @@
+name: hecate-core
+version: 0.1.0
+
+authors:
+  - Chris Watson <cawatson1993@gmail.com>
+
+description: |
+  Core diagnostics and utilities for the Hecate language toolkit.
+  Provides source mapping, span tracking, and beautiful error rendering.
+
+crystal: '>= 1.17.0'
+
+license: MIT

@@ -1,0 +1,24 @@
+name: hecate
+version: 0.1.0
+
+authors:
+  - watzon <watzonmusic@gmail.com>
+
+description: |
+  A batteries-included language development toolkit for Crystal
+
+license: MIT
+
+# Workspace dependencies - path references to all shards
+dependencies:
+  hecate-core:
+    path: ./shards/hecate-core
+  hecate-lex:
+    path: ./shards/hecate-lex
+
+development_dependencies:
+  ameba:
+    github: crystal-ameba/ameba
+    version: ~> 1.6.0
+
+crystal: ">= 1.17.0"

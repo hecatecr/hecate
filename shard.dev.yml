@@ -1,0 +1,22 @@
+name: hecate
+version: 0.1.0
+
+authors:
+  - Chris Watson <cawatson1993@gmail.com>
+
+crystal: ">= 1.17.1"
+
+license: MIT
+
+dependencies:
+  hecate-core:
+    path: ./shards/hecate-core
+  hecate-lex:
+    path: ./shards/hecate-lex
+
+# Make components available directly for testing
+targets:
+  hecate-core:
+    main: shards/hecate-core/src/hecate-core.cr
+  hecate-lex:
+    main: shards/hecate-lex/src/hecate-lex.cr

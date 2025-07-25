@@ -1,7 +1,7 @@
 # Hecate
 
 [![CI](https://github.com/hecatecr/hecate/workflows/CI/badge.svg)](https://github.com/hecatecr/hecate/actions)
-[![Crystal Version](https://img.shields.io/badge/crystal-%3E%3D%201.17.0-brightgreen)](https://crystal-lang.org/)
+[![Crystal Version](https://img.shields.io/badge/crystal-latest-brightgreen)](https://crystal-lang.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A batteries-included language development toolkit for Crystal. Build your own programming languages and DSLs with first-class diagnostics, incremental parsing, and IDE support.

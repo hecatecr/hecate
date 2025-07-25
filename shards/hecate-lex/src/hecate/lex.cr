@@ -3,6 +3,7 @@ require "./lex/token"
 require "./lex/rule"
 require "./lex/scanner"
 require "./lex/lexer"
+require "./lex/token_stream"
 require "./lex/dsl"
 require "./lex/error_handlers"
 

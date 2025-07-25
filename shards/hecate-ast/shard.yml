@@ -1,0 +1,17 @@
+name: hecate-ast
+version: 0.1.0
+
+authors:
+  - Chris Watson <cawatson1993@gmail.com>
+
+description: |
+  AST node definitions and utilities for the Hecate language toolkit.
+  Provides macro-based DSL for defining AST nodes with automatic visitor pattern support.
+
+crystal: '>= 1.17.0'
+
+license: MIT
+
+dependencies:
+  hecate-core:
+    github: hecatecr/hecate-core

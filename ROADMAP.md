@@ -17,19 +17,20 @@ Hecate aims to provide a complete toolkit for building programming languages and
   - [x] TTY renderer with colorized output
   - [x] Diagnostic builder API
   - [x] Test utilities (snapshot & golden file testing)
+- [ ] **hecate-ast**: AST node generation
+  - [ ] Macro-based node definitions
+  - [ ] Visitor pattern support
+  - [ ] Pattern matching helpers
 - [x] **hecate-lex**: Declarative lexer generation
   - [x] Token definition DSL
   - [x] Priority-based longest-match resolution
   - [x] Error recovery and diagnostics
   - [x] Nesting tracker for balanced delimiters
-- [ ] **hecate-parse**: Parser combinators (Pratt)
-  - [ ] Basic combinator library
-  - [ ] Precedence handling
-  - [ ] Error recovery strategies
-- [ ] **hecate-ast**: AST node generation
-  - [ ] Macro-based node definitions
-  - [ ] Visitor pattern support
-  - [ ] Pattern matching helpers
+- [ ] **hecate-parse**: Parser combinators
+  - [ ] Operator-based combinator DSL
+  - [ ] Transform operators (`>>`, `<<`)
+  - [ ] Repetition and optional operators
+  - [ ] Complex sequential parsing support
 - [ ] **hecate-cli**: Basic CLI (build/run)
   - [ ] Project scaffolding (`hecate new`)
   - [ ] Build command with diagnostics
@@ -115,11 +116,14 @@ hecate-cli
     ├── hecate-codegen
     │   └── hecate-ir
     │       └── hecate-sem
-    │           └── hecate-ast
-    │               └── hecate-parse
-    │                   └── hecate-lex
-    │                       └── hecate-core
+    │           └── hecate-parse
+    │               ├── hecate-ast
+    │               ├── hecate-lex
+    │               └── hecate-core
     └── hecate-core (direct dependency for diagnostics)
+
+Note: hecate-ast depends only on hecate-core, allowing AST definitions
+to be created before parser implementation.
 ```
 
 ## Development Principles

@@ -24,9 +24,9 @@ Hecate is organized as a monorepo with independently versioned shards:
 hecate/
 ├── shards/
 │   ├── hecate-core/    # Diagnostics, source mapping, and utilities
+│   ├── hecate-ast/     # AST node definitions and visitors
 │   ├── hecate-lex/     # Lexer generation and tokenization
 │   ├── hecate-parse/   # Parser combinators and Tree-sitter bridge
-│   ├── hecate-ast/     # AST node definitions and visitors
 │   ├── hecate-sem/     # Semantic analysis and type checking
 │   ├── hecate-ir/      # Intermediate representation
 │   ├── hecate-codegen/ # Code generation backends
@@ -118,9 +118,9 @@ done
 ## Roadmap
 
 - [x] Core diagnostics system
+- [ ] AST framework
 - [x] Basic lexer generation
 - [ ] Parser combinators
-- [ ] AST framework
 - [ ] Semantic analysis
 - [ ] Crystal transpiler
 - [ ] LSP server

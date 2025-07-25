@@ -13,6 +13,8 @@ dependencies:
     path: ./shards/hecate-core
   hecate-lex:
     path: ./shards/hecate-lex
+  hecate-ast:
+    path: ./shards/hecate-ast
 
 # Make components available directly for testing
 targets:
@@ -20,3 +22,5 @@ targets:
     main: shards/hecate-core/src/hecate-core.cr
   hecate-lex:
     main: shards/hecate-lex/src/hecate-lex.cr
+  hecate-ast:
+    main: shards/hecate-ast/src/hecate-ast.cr

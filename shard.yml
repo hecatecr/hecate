@@ -13,3 +13,5 @@ dependencies:
     github: hecatecr/hecate-core
   hecate-lex:
     github: hecatecr/hecate-lex
+  hecate-ast:
+    github: hecatecr/hecate-ast

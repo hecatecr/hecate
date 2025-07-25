@@ -26,6 +26,7 @@ test:
     @shards install
     @crystal spec shards/hecate-core/spec --error-on-warnings
     @crystal spec shards/hecate-lex/spec --error-on-warnings
+    @crystal spec shards/hecate-ast/spec --error-on-warnings
     @echo "✅ All tests passed"
 
 # Run tests for a specific shard (from root directory)
@@ -40,6 +41,7 @@ check:
     @echo "🔍 Checking compilation of all shards..."
     @crystal build --no-codegen shards/hecate-core/src/**/*.cr
     @crystal build --no-codegen shards/hecate-lex/src/**/*.cr
+    @crystal build --no-codegen shards/hecate-ast/src/**/*.cr
     @echo "✅ All shards compile successfully"
 
 # Performance Benchmarking

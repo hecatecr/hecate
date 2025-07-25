@@ -37,9 +37,6 @@ jobs:
         with:
           crystal: latest
       
-      - name: Install just
-        uses: extractions/setup-just@v2
-      
       - name: Cache shards
         uses: actions/cache@v4
         with:
@@ -53,14 +50,16 @@ jobs:
             ${{ runner.os }}-shards-latest-
       
       - name: Install dependencies
-        run: just install
+        run: |
+          export SHARDS_OVERRIDE=shard.dev.yml
+          shards install
       
       - name: Run tests for specific shard
-        run: just test-shard ${{ matrix.shard }}
+        run: |
+          crystal spec shards/hecate-${{ matrix.shard }}/spec --error-on-warnings
       
       - name: Build shard
         run: |
-          export SHARDS_OVERRIDE=shard.dev.yml
           crystal build --no-codegen shards/hecate-${{ matrix.shard }}/src/hecate-${{ matrix.shard }}.cr
 
   # Test the monorepo integration
@@ -90,16 +89,20 @@ jobs:
             ${{ runner.os }}-shards-latest-integration-
       
       - name: Install all dependencies
-        run: just install
+        run: |
+          export SHARDS_OVERRIDE=shard.dev.yml
+          shards install
       
       - name: Run all tests from root
-        run: just test
+        run: |
+          crystal spec shards/hecate-core/spec --error-on-warnings
+          crystal spec shards/hecate-lex/spec --error-on-warnings
       
       - name: Check examples build
         run: |
-          just example-json
-          just example-js
-          just example-dynamic
+          crystal run shards/hecate-lex/examples/json_lexer.cr -- shards/hecate-lex/examples/sample.json
+          crystal run shards/hecate-lex/examples/mini_js_lexer.cr -- shards/hecate-lex/examples/sample.js
+          crystal run shards/hecate-lex/examples/dynamic_lexer_demo.cr
 
   docs:
     runs-on: ubuntu-latest
@@ -113,13 +116,12 @@ jobs:
         with:
           crystal: latest
       
-      - name: Install just
-        uses: extractions/setup-just@v2
-      
       - name: Install dependencies
         run: |
-          cd shards/hecate-core && shards install
-          cd ../hecate-lex && shards install
+          export SHARDS_OVERRIDE=shard.dev.yml
+          shards install
       
       - name: Generate documentation
-        run: just docs
+        run: |
+          crystal docs shards/hecate-core/src/hecate-core.cr --project-name="Hecate Core" --project-version="0.1.0" --output=docs/hecate-core
+          crystal docs shards/hecate-lex/src/hecate-lex.cr --project-name="Hecate Lex" --project-version="0.1.0" --output=docs/hecate-lex

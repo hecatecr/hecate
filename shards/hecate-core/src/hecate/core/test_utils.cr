@@ -39,7 +39,7 @@ module Hecate::Core
       # Records or verifies a snapshot
       def self.match(name : String, actual : String, *, update = false) : Nil
         snapshot_path = snapshot_path_for(name)
-        
+
         if update || !File.exists?(snapshot_path)
           # Create or update snapshot
           Dir.mkdir_p(File.dirname(snapshot_path))
@@ -117,7 +117,7 @@ module Hecate::Core
         private def generate_diff(expected : String, actual : String) : String
           expected_lines = expected.lines
           actual_lines = actual.lines
-          
+
           diff_lines = [] of String
           diff_lines << "Expected:"
           expected_lines.each_with_index do |line, i|
@@ -127,7 +127,7 @@ module Hecate::Core
               diff_lines << "  #{line}"
             end
           end
-          
+
           diff_lines << "\nActual:"
           actual_lines.each_with_index do |line, i|
             if i < expected_lines.size && line != expected_lines[i]
@@ -138,7 +138,7 @@ module Hecate::Core
               diff_lines << "  #{line}"
             end
           end
-          
+
           diff_lines.join('\n')
         end
       end
@@ -152,7 +152,7 @@ module Hecate::Core
       # Test against a golden file
       def self.test(name : String, actual : String, *, update = false) : Nil
         golden_path = golden_path_for(name)
-        
+
         if update || !File.exists?(golden_path)
           # Create or update golden file
           Dir.mkdir_p(File.dirname(golden_path))
@@ -169,9 +169,9 @@ module Hecate::Core
 
       # Get the golden file path
       private def self.golden_path_for(name : String) : String
-        # Golden files are stored at project root level
+        # Golden files are stored in spec/fixtures/golden
         project_root = find_project_root
-        File.join(project_root, "test", GOLDEN_DIR, name)
+        File.join(project_root, "spec", "fixtures", GOLDEN_DIR, name)
       end
 
       # Find project root by looking for shard.yml
@@ -206,7 +206,7 @@ module Hecate::Core
       def self.identifier(length : Int32 = 8) : String
         chars = ('a'..'z').to_a + ('A'..'Z').to_a + ('0'..'9').to_a + ['_']
         first_chars = ('a'..'z').to_a + ('A'..'Z').to_a + ['_']
-        
+
         String.build(length) do |str|
           str << first_chars.sample
           (length - 1).times { str << chars.sample }
@@ -222,7 +222,7 @@ module Hecate::Core
           "return #{identifier}",
           "// #{identifier} comment",
         ]
-        
+
         Array.new(lines) { templates.sample }.join('\n')
       end
 

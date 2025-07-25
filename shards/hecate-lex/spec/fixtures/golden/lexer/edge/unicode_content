@@ -1,0 +1,9 @@
+# Token Sequence Golden File
+# Format: TYPE:"lexeme"@start:end
+
+Word:"hello"@0:5
+Word:"世界"@6:8
+Word:"café"@9:13
+Emoji:"🚀"@14:15
+Word:"Здравствуй"@16:26
+Word:"мир"@27:30

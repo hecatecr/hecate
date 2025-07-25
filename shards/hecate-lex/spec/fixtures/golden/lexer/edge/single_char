@@ -1,0 +1,4 @@
+# Token Sequence Golden File
+# Format: TYPE:"lexeme"@start:end
+
+Word:"a"@0:1

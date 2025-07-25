@@ -1,0 +1,42 @@
+# Token Sequence Golden File
+# Format: TYPE:"lexeme"@start:end
+
+Identifier:"let"@0:3
+Identifier:"x"@4:5
+Equal:"="@6:7
+Integer:"42"@8:10
+Semicolon:";"@10:11
+Identifier:"let"@12:15
+Identifier:"y"@16:17
+Equal:"="@18:19
+Float:"3.14159"@20:27
+Semicolon:";"@27:28
+Identifier:"let"@29:32
+Identifier:"name"@33:37
+Equal:"="@38:39
+String:"\"Hello, World!\""@40:55
+Semicolon:";"@55:56
+Identifier:"let"@57:60
+Identifier:"result"@61:67
+Equal:"="@68:69
+Identifier:"x"@70:71
+Plus:"+"@72:73
+Identifier:"y"@74:75
+Star:"*"@76:77
+Integer:"2"@78:79
+Semicolon:";"@79:80
+Identifier:"let"@81:84
+Identifier:"comparison"@85:95
+Equal:"="@96:97
+LeftParen:"("@98:99
+Identifier:"x"@99:100
+EqualEqual:"=="@101:103
+Integer:"42"@104:106
+RightParen:")"@106:107
+NotEqual:"!="@108:110
+LeftParen:"("@111:112
+Identifier:"y"@112:113
+Greater:">"@114:115
+Identifier:"x"@116:117
+RightParen:")"@117:118
+Semicolon:";"@118:119

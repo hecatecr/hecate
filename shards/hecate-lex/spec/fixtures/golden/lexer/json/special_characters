@@ -1,0 +1,28 @@
+# Token Sequence Golden File
+# Format: TYPE:"lexeme"@start:end
+
+LeftBrace:"{"@0:1
+String:"\"unicode\""@4:13
+Colon:":"@13:14
+String:"\"こんにちは\""@15:22
+Comma:","@22:23
+String:"\"escaped\""@26:35
+Colon:":"@35:36
+Number:"1"@42:43
+Number:"2"@49:50
+String:"\",\n  \""@55:61
+String:"\": \""@67:71
+String:"\"\""@88:90
+Comma:","@90:91
+String:"\"numbers\""@94:103
+Colon:":"@103:104
+LeftBracket:"["@105:106
+Number:"-42"@106:109
+Comma:","@109:110
+Number:"3.14159"@111:118
+Comma:","@118:119
+Number:"1.23e-4"@120:127
+Comma:","@127:128
+Number:"2E+10"@129:134
+RightBracket:"]"@134:135
+RightBrace:"}"@136:137

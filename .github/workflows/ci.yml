@@ -102,7 +102,7 @@ jobs:
         run: |
           crystal run shards/hecate-lex/examples/json_lexer.cr -- shards/hecate-lex/examples/sample.json
           crystal run shards/hecate-lex/examples/mini_js_lexer.cr -- shards/hecate-lex/examples/sample.js
-          crystal run shards/hecate-lex/examples/dynamic_lexer_demo.cr
+          crystal run shards/hecate-lex/examples/dynamic_lexer_demo.cr -- shards/hecate-lex/examples/sample.js
 
   docs:
     runs-on: ubuntu-latest

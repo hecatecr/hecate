@@ -10,4 +10,4 @@ license: MIT
 
 dependencies:
   hecate-core:
-    path: ../hecate-core
+    github: hecatecr/hecate-core

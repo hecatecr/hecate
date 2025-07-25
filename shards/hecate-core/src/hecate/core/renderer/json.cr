@@ -77,8 +77,8 @@ module Hecate::Core::Renderer
       getter code : String?
       getter related_information : Array(LSPRelatedInformation)?
 
-      def initialize(@range : LSPRange, @severity : Int32, @source : String, 
-                     @message : String, @code : String? = nil, 
+      def initialize(@range : LSPRange, @severity : Int32, @source : String,
+                     @message : String, @code : String? = nil,
                      @related_information : Array(LSPRelatedInformation)? = nil)
       end
     end
@@ -95,7 +95,7 @@ module Hecate::Core::Renderer
       when .hint?
         LSPSeverity::Hint.value
       else
-        LSPSeverity::Error.value  # Default to error for unknown severity
+        LSPSeverity::Error.value # Default to error for unknown severity
       end
     end
 
@@ -257,11 +257,11 @@ module Hecate::Core::Renderer
       grouped.each do |uri, file_diagnostics|
         results << {
           "jsonrpc" => "2.0",
-          "method" => "textDocument/publishDiagnostics",
-          "params" => {
-            "uri" => uri,
-            "diagnostics" => file_diagnostics
-          }.as(Hash(String, String | Array(LSPDiagnostic)))
+          "method"  => "textDocument/publishDiagnostics",
+          "params"  => {
+            "uri"         => uri,
+            "diagnostics" => file_diagnostics,
+          }.as(Hash(String, String | Array(LSPDiagnostic))),
         }
       end
 
@@ -311,7 +311,7 @@ module Hecate::Core::Renderer
       if help = diagnostic.help
         full_message += "\n#{help}"
       end
-      
+
       # Include notes in the message as well as related information
       unless diagnostic.notes.empty?
         diagnostic.notes.each do |note|

@@ -3,9 +3,9 @@
 /bin/
 /.shards/
 *.dwarf
-/docs/
 /.crystal/
 shard.lock
+/docs/
 
 # Build artifacts
 *.o

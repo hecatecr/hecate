@@ -57,14 +57,14 @@ module Hecate::Lex
           # No rule matched - this is a lexical error
           char = input[position]
           char_span = Hecate::Core::Span.new(source_file.id, position, position + 1)
-          
+
           diagnostic = Hecate.error("unexpected character")
             .primary(char_span, "unexpected '#{char}'")
             .help("remove this character or add a lexer rule to handle it")
             .build
 
           diagnostics << diagnostic
-          position += 1  # Skip the problematic character and continue
+          position += 1 # Skip the problematic character and continue
         end
       end
 
@@ -76,7 +76,7 @@ module Hecate::Lex
       @rules
     end
 
-    # Get error handlers (for inspection/debugging)  
+    # Get error handlers (for inspection/debugging)
     def error_handlers
       @error_handlers
     end

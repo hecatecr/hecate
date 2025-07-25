@@ -24,10 +24,10 @@ module Hecate::Lex
   struct Token(T)
     # The kind/type of this token (typically an enum value)
     getter kind : T
-    
+
     # The source location of this token
     getter span : Hecate::Core::Span
-    
+
     # Optional semantic value (used for caching or when source is unavailable)
     getter value : String?
 

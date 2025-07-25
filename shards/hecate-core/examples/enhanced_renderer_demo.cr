@@ -8,17 +8,17 @@ complex_code = %q{class Calculator
   def initialize(@precision : Int32 = 2)
     @history = [] of String
   end
-  
+
   def calculate(expression)
     result = parse_and_evaluate(expression)
     @history << "#{expression} = #{result}"
     format_result(result)
   end
-  
+
   private def parse_and_evaluate(expr)
     # This method has multiple responsibilities
     tokens = tokenize(expr)
-    ast = parse_tokens(tokens)  
+    ast = parse_tokens(tokens)
     evaluate_ast(ast)
   end
 end}
@@ -39,11 +39,11 @@ precision_param_end = precision_param_pos + "@precision".size
 default_value_pos = complex_code.index("= 2").not_nil!
 default_value_end = default_value_pos + "= 2".size
 
-span1 = Hecate::Core::Span.new(source_id, precision_param_pos, precision_param_end)  # "@precision"
-span2 = Hecate::Core::Span.new(source_id, default_value_pos, default_value_end)  # "= 2"
+span1 = Hecate::Core::Span.new(source_id, precision_param_pos, precision_param_end) # "@precision"
+span2 = Hecate::Core::Span.new(source_id, default_value_pos, default_value_end)     # "= 2"
 
 diagnostic1 = Hecate::Core::Diagnostic.new(
-  Hecate::Core::Diagnostic::Severity::Warning, 
+  Hecate::Core::Diagnostic::Severity::Warning,
   "parameter naming issues"
 )
 diagnostic1.primary(span1, "parameter name could be shorter")
@@ -79,13 +79,13 @@ diagnostic2.help("split into separate methods: tokenize, parse, and evaluate")
 renderer.emit(diagnostic2, source_map)
 puts
 
-# Example 3: Edge case - Labels at file boundaries  
+# Example 3: Edge case - Labels at file boundaries
 boundary_code = "x\ny\nz"
 boundary_id = source_map.add_file("tiny.cr", boundary_code)
 
 puts "3. File Boundary Labels:"
-first_char = Hecate::Core::Span.new(boundary_id, 0, 1)  # "x"
-last_char = Hecate::Core::Span.new(boundary_id, 4, 5)   # "z"
+first_char = Hecate::Core::Span.new(boundary_id, 0, 1) # "x"
+last_char = Hecate::Core::Span.new(boundary_id, 4, 5)  # "z"
 
 diagnostic3 = Hecate::Core::Diagnostic.new(
   Hecate::Core::Diagnostic::Severity::Error,
@@ -105,11 +105,11 @@ severities = [
   {Hecate::Core::Diagnostic::Severity::Error, "critical error", "this will cause a crash"},
   {Hecate::Core::Diagnostic::Severity::Warning, "potential issue", "this might cause problems"},
   {Hecate::Core::Diagnostic::Severity::Info, "informational", "this is just for your information"},
-  {Hecate::Core::Diagnostic::Severity::Hint, "suggestion", "you might want to consider this"}
+  {Hecate::Core::Diagnostic::Severity::Hint, "suggestion", "you might want to consider this"},
 ]
 
 severities.each do |severity, message, note|
-  simple_span = Hecate::Core::Span.new(boundary_id, 2, 3)  # "y"
+  simple_span = Hecate::Core::Span.new(boundary_id, 2, 3) # "y"
   diag = Hecate::Core::Diagnostic.new(severity, message)
   diag.primary(simple_span, "here")
   diag.note(note)

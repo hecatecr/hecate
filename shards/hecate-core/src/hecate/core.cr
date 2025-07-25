@@ -1,7 +1,7 @@
 module Hecate
   module Core
     VERSION = "0.1.0"
-    
+
     # Core module for Hecate language development toolkit
     # This module provides:
     # - Source file management and mapping

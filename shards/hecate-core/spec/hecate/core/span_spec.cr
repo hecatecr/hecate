@@ -54,20 +54,20 @@ describe Hecate::Core::Span do
       span4 = Hecate::Core::Span.new(1_u32, 10, 21)
 
       (span1 == span2).should be_true
-      (span1 == span3).should be_false  # Different source
-      (span1 == span4).should be_false  # Different end
+      (span1 == span3).should be_false # Different source
+      (span1 == span4).should be_false # Different end
     end
   end
 
   describe "#contains?" do
     it "checks if byte offset is within span" do
       span = Hecate::Core::Span.new(1_u32, 10, 20)
-      
+
       span.contains?(9).should be_false
-      span.contains?(10).should be_true   # Start is inclusive
+      span.contains?(10).should be_true # Start is inclusive
       span.contains?(15).should be_true
       span.contains?(19).should be_true
-      span.contains?(20).should be_false  # End is exclusive
+      span.contains?(20).should be_false # End is exclusive
       span.contains?(21).should be_false
     end
 
@@ -84,22 +84,22 @@ describe Hecate::Core::Span do
       span3 = Hecate::Core::Span.new(1_u32, 20, 30)
       span4 = Hecate::Core::Span.new(1_u32, 5, 15)
 
-      span1.overlaps?(span2).should be_true   # Partial overlap
-      span1.overlaps?(span3).should be_false  # Adjacent, no overlap
-      span1.overlaps?(span4).should be_true   # Partial overlap
+      span1.overlaps?(span2).should be_true  # Partial overlap
+      span1.overlaps?(span3).should be_false # Adjacent, no overlap
+      span1.overlaps?(span4).should be_true  # Partial overlap
     end
 
     it "returns false for spans from different sources" do
       span1 = Hecate::Core::Span.new(1_u32, 10, 20)
       span2 = Hecate::Core::Span.new(2_u32, 10, 20)
-      
+
       span1.overlaps?(span2).should be_false
     end
 
     it "handles contained spans" do
       span1 = Hecate::Core::Span.new(1_u32, 10, 30)
       span2 = Hecate::Core::Span.new(1_u32, 15, 25)
-      
+
       span1.overlaps?(span2).should be_true
       span2.overlaps?(span1).should be_true
     end
@@ -109,7 +109,7 @@ describe Hecate::Core::Span do
     it "merges overlapping spans" do
       span1 = Hecate::Core::Span.new(1_u32, 10, 20)
       span2 = Hecate::Core::Span.new(1_u32, 15, 25)
-      
+
       merged = span1.merge(span2)
       merged.source_id.should eq(1_u32)
       merged.start_byte.should eq(10)
@@ -119,7 +119,7 @@ describe Hecate::Core::Span do
     it "merges non-overlapping spans" do
       span1 = Hecate::Core::Span.new(1_u32, 10, 20)
       span2 = Hecate::Core::Span.new(1_u32, 30, 40)
-      
+
       merged = span1.merge(span2)
       merged.start_byte.should eq(10)
       merged.end_byte.should eq(40)
@@ -128,14 +128,14 @@ describe Hecate::Core::Span do
     it "handles same span merge" do
       span = Hecate::Core::Span.new(1_u32, 10, 20)
       merged = span.merge(span)
-      
+
       merged.should eq(span)
     end
 
     it "raises error for different source spans" do
       span1 = Hecate::Core::Span.new(1_u32, 10, 20)
       span2 = Hecate::Core::Span.new(2_u32, 10, 20)
-      
+
       expect_raises(ArgumentError, "Cannot merge spans from different sources") do
         span1.merge(span2)
       end

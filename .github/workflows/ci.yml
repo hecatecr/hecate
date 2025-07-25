@@ -37,32 +37,31 @@ jobs:
         with:
           crystal: latest
       
+      - name: Install just
+        uses: extractions/setup-just@v2
+      
       - name: Cache shards
         uses: actions/cache@v4
         with:
           path: |
             ~/.cache/shards
             lib
-            shards/hecate-${{ matrix.shard }}/lib
-          key: ${{ runner.os }}-shards-latest-${{ matrix.shard }}-${{ hashFiles('**/shard.yml') }}
+            shards/*/lib
+          key: ${{ runner.os }}-shards-latest-${{ matrix.shard }}-${{ hashFiles('shard.yml', 'shard.dev.yml', '**/shard.yml') }}
           restore-keys: |
             ${{ runner.os }}-shards-latest-${{ matrix.shard }}-
             ${{ runner.os }}-shards-latest-
       
       - name: Install dependencies
-        run: |
-          cd shards/hecate-${{ matrix.shard }}
-          shards install
+        run: just install
       
-      - name: Run tests
-        run: |
-          cd shards/hecate-${{ matrix.shard }}
-          crystal spec --error-on-warnings
+      - name: Run tests for specific shard
+        run: just test-shard ${{ matrix.shard }}
       
       - name: Build shard
         run: |
-          cd shards/hecate-${{ matrix.shard }}
-          crystal build --no-codegen src/hecate-${{ matrix.shard }}.cr
+          export SHARDS_OVERRIDE=shard.dev.yml
+          crystal build --no-codegen shards/hecate-${{ matrix.shard }}/src/hecate-${{ matrix.shard }}.cr
 
   # Test the monorepo integration
   integration:

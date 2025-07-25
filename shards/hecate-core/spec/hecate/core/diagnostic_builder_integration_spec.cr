@@ -12,7 +12,7 @@ describe "DiagnosticBuilder Integration Tests" do
           return fibonacci(n - 1) + fibonacci(n - 2)
         }
       CODE
-      
+
       # Build a comprehensive diagnostic using the fluent API
       diagnostic = Hecate::Core.error("undefined variable 'x'")
         .primary(span(45, 1), "undefined variable used here")
@@ -22,18 +22,18 @@ describe "DiagnosticBuilder Integration Tests" do
         .note("all variables must be defined before use")
         .note("consider adding a variable declaration")
         .build
-      
+
       # Verify the complete diagnostic structure
       diagnostic.severity.should eq(Hecate::Core::Diagnostic::Severity::Error)
       diagnostic.message.should eq("undefined variable 'x'")
-      
+
       # Verify labels
       diagnostic.labels.size.should eq(3)
       diagnostic.labels[0].message.should eq("undefined variable used here")
       diagnostic.labels[0].style.should eq(Hecate::Core::Diagnostic::Label::Style::Primary)
       diagnostic.labels[1].style.should eq(Hecate::Core::Diagnostic::Label::Style::Secondary)
       diagnostic.labels[2].style.should eq(Hecate::Core::Diagnostic::Label::Style::Secondary)
-      
+
       # Verify help and notes
       diagnostic.help.should eq("did you mean to use 'n' instead of 'x'?")
       diagnostic.notes.size.should eq(2)
@@ -48,7 +48,7 @@ describe "DiagnosticBuilder Integration Tests" do
         .help("remove the extra semicolon")
         .note("semicolons are not required after block statements")
         .build
-      
+
       diagnostic.error?.should be_true
       diagnostic.labels.size.should eq(2)
       diagnostic.help.should_not be_nil
@@ -61,7 +61,7 @@ describe "DiagnosticBuilder Integration Tests" do
         .help("remove the variable or prefix with '_' to suppress this warning")
         .note("unused variables may indicate dead code")
         .build
-      
+
       diagnostic.warning?.should be_true
       diagnostic.labels.size.should eq(1)
       diagnostic.labels[0].style.should eq(Hecate::Core::Diagnostic::Label::Style::Primary)
@@ -71,7 +71,7 @@ describe "DiagnosticBuilder Integration Tests" do
   describe "edge case handling" do
     it "builds minimal diagnostic with no labels or help" do
       diagnostic = Hecate::Core.info("compilation complete").build
-      
+
       diagnostic.severity.should eq(Hecate::Core::Diagnostic::Severity::Info)
       diagnostic.message.should eq("compilation complete")
       diagnostic.labels.should be_empty
@@ -85,7 +85,7 @@ describe "DiagnosticBuilder Integration Tests" do
         .help("")
         .note("")
         .build
-      
+
       diagnostic.message.should eq("")
       diagnostic.labels.size.should eq(1)
       diagnostic.labels[0].message.should eq("")
@@ -97,10 +97,10 @@ describe "DiagnosticBuilder Integration Tests" do
     it "handles multiple build calls on same builder" do
       builder = Hecate::Core.error("test error")
         .primary(span(10, 5), "location")
-      
+
       first_build = builder.build
       second_build = builder.build
-      
+
       # Both should be the same diagnostic instance
       first_build.should be(second_build)
       first_build.message.should eq("test error")
@@ -110,18 +110,18 @@ describe "DiagnosticBuilder Integration Tests" do
     it "allows modification after first build" do
       builder = Hecate::Core.warning("initial warning")
         .primary(span(10, 5), "first location")
-      
+
       first_diagnostic = builder.build
       first_diagnostic.labels.size.should eq(1)
-      
+
       # Add more to the builder
       builder.secondary(span(20, 3), "second location")
         .help("additional help")
-      
+
       second_diagnostic = builder.build
       second_diagnostic.labels.size.should eq(2)
       second_diagnostic.help.should eq("additional help")
-      
+
       # Should be the same instance, modified
       first_diagnostic.should be(second_diagnostic)
     end
@@ -135,7 +135,7 @@ describe "DiagnosticBuilder Integration Tests" do
         .help("remove or replace the invalid character")
         .note("only letters, digits, and underscore are allowed in identifiers")
         .build
-      
+
       diagnostic.error?.should be_true
       diagnostic.message.should contain("invalid character")
     end
@@ -148,7 +148,7 @@ describe "DiagnosticBuilder Integration Tests" do
         .help("add a closing '}' to match the opening brace")
         .note("all opening braces must have corresponding closing braces")
         .build
-      
+
       diagnostic.labels.size.should eq(2)
       diagnostic.labels[1].style.should eq(Hecate::Core::Diagnostic::Label::Style::Secondary)
     end
@@ -161,7 +161,7 @@ describe "DiagnosticBuilder Integration Tests" do
         .help("use explicit conversion with .to_s")
         .note("implicit conversions may cause unexpected behavior")
         .build
-      
+
       diagnostic.warning?.should be_true
       diagnostic.message.should contain("implicit conversion")
     end
@@ -170,7 +170,7 @@ describe "DiagnosticBuilder Integration Tests" do
   describe "builder immutability and state" do
     it "preserves diagnostic state through chaining" do
       builder = Hecate::Core.error("state test")
-      
+
       # Each call should return the same builder instance
       same_builder = builder
         .primary(span(10, 5), "first")
@@ -178,7 +178,7 @@ describe "DiagnosticBuilder Integration Tests" do
         .help("help text")
         .note("first note")
         .note("second note")
-      
+
       builder.should be(same_builder)
       builder.label_count.should eq(2)
       builder.note_count.should eq(2)
@@ -187,24 +187,24 @@ describe "DiagnosticBuilder Integration Tests" do
 
     it "provides accurate state queries during building" do
       builder = Hecate::Core.hint("state queries")
-      
+
       # Initially empty
       builder.label_count.should eq(0)
       builder.note_count.should eq(0)
       builder.has_help?.should be_false
-      
+
       # After adding primary label
       builder.primary(span(10, 5), "label")
       builder.label_count.should eq(1)
       builder.note_count.should eq(0)
       builder.has_help?.should be_false
-      
+
       # After adding help
       builder.help("help text")
       builder.label_count.should eq(1)
       builder.note_count.should eq(0)
       builder.has_help?.should be_true
-      
+
       # After adding notes
       builder.note("note 1").note("note 2")
       builder.label_count.should eq(1)
@@ -219,11 +219,11 @@ describe "DiagnosticBuilder Integration Tests" do
         .primary(span(10, 5), "error location")
         .help("fix suggestion")
         .build
-      
+
       # Should work with existing diagnostic methods
       diagnostic.error?.should be_true
       diagnostic.warning?.should be_false
-      
+
       # Should work with test matchers
       [diagnostic].should have_error("compatibility test")
       [diagnostic].should have_error(span: span(10, 5))
@@ -233,14 +233,14 @@ describe "DiagnosticBuilder Integration Tests" do
       diagnostics = [
         Hecate::Core.error("first error").primary(span(10, 5), "here").build,
         Hecate::Core.warning("first warning").primary(span(20, 3), "there").build,
-        Hecate::Core.info("info message").build
+        Hecate::Core.info("info message").build,
       ]
-      
+
       diagnostics.size.should eq(3)
       diagnostics[0].error?.should be_true
       diagnostics[1].warning?.should be_true
       diagnostics[2].severity.should eq(Hecate::Core::Diagnostic::Severity::Info)
-      
+
       # Should work with test matchers
       diagnostics.should have_error
       diagnostics.should have_warning

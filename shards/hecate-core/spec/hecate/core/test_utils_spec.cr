@@ -27,11 +27,11 @@ describe Hecate::Core::TestUtils do
       with_temp_dir do |dir|
         # Mock the caller to return our temp spec file
         snapshot_path = File.join(dir, "spec", "__snapshots__", "test.snap")
-        
+
         # This would normally be done by the macro, but we'll test directly
         Dir.mkdir_p(File.dirname(snapshot_path))
         File.write(snapshot_path, "test content")
-        
+
         File.exists?(snapshot_path).should be_true
         File.read(snapshot_path).should eq("test content")
       end
@@ -42,11 +42,11 @@ describe Hecate::Core::TestUtils do
         snapshot_path = File.join(dir, "__snapshots__", "mismatch.snap")
         Dir.mkdir_p(File.dirname(snapshot_path))
         File.write(snapshot_path, "expected content")
-        
+
         # This would raise in real usage
         expected = File.read(snapshot_path)
         actual = "actual content"
-        
+
         expected.should_not eq(actual)
       end
     end
@@ -54,7 +54,7 @@ describe Hecate::Core::TestUtils do
     it "normalizes content in formatted snapshots" do
       content = "line 1  \nline 2\r\nline 3   "
       normalized = content.lines.map(&.rstrip).join('\n').rstrip + '\n'
-      
+
       normalized.should eq("line 1\nline 2\nline 3\n")
     end
   end
@@ -78,7 +78,7 @@ describe Hecate::Core::TestUtils do
       snippet = Generators.source_snippet(3)
       lines = snippet.lines
       lines.size.should eq(3)
-      
+
       # Each line should match one of the templates
       lines.each do |line|
         valid = line.starts_with?("let ") ||
@@ -104,9 +104,9 @@ describe Hecate::Core::TestUtils do
     it "matches diagnostics by severity" do
       diagnostics = [
         diagnostic(Hecate::Core::Diagnostic::Severity::Error, "test error", span(0, 5)),
-        diagnostic(Hecate::Core::Diagnostic::Severity::Warning, "test warning", span(10, 5))
+        diagnostic(Hecate::Core::Diagnostic::Severity::Warning, "test warning", span(10, 5)),
       ]
-      
+
       diagnostics.should have_error
       diagnostics.should have_warning
       diagnostics.should_not have_info
@@ -115,9 +115,9 @@ describe Hecate::Core::TestUtils do
 
     it "matches diagnostics by message" do
       diagnostics = [
-        diagnostic(Hecate::Core::Diagnostic::Severity::Error, "undefined variable", span(0, 5))
+        diagnostic(Hecate::Core::Diagnostic::Severity::Error, "undefined variable", span(0, 5)),
       ]
-      
+
       diagnostics.should have_error("undefined variable")
       diagnostics.should have_error(/undefined/)
       diagnostics.should_not have_error("syntax error")
@@ -126,9 +126,9 @@ describe Hecate::Core::TestUtils do
     it "matches diagnostics by span" do
       test_span = span(10, 5)
       diagnostics = [
-        diagnostic(Hecate::Core::Diagnostic::Severity::Error, "error", test_span)
+        diagnostic(Hecate::Core::Diagnostic::Severity::Error, "error", test_span),
       ]
-      
+
       diagnostics.should have_error(span: test_span)
       diagnostics.should_not have_error(span: span(0, 5))
     end
@@ -151,7 +151,7 @@ describe Hecate::Core::TestUtils do
         puts "stdout message"
         STDERR.puts "stderr message"
       end
-      
+
       # Simple implementation just returns empty strings
       result[:stdout].should eq("")
       result[:stderr].should eq("")

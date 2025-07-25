@@ -15,12 +15,12 @@ enum MiniJSTokens
   TRUE
   FALSE
   NULL
-  
+
   # Identifiers and Literals
   IDENTIFIER
   NUMBER
   STRING
-  
+
   # Operators
   PLUS
   MINUS
@@ -38,7 +38,7 @@ enum MiniJSTokens
   AND
   OR
   NOT
-  
+
   # Punctuation
   LPAREN
   RPAREN
@@ -51,7 +51,7 @@ enum MiniJSTokens
   DOT
   COLON
   ARROW
-  
+
   # Special
   WHITESPACE
   NEWLINE
@@ -75,16 +75,16 @@ def create_mini_js_lexer
     ctx.token :TRUE, /true/, priority: 20
     ctx.token :FALSE, /false/, priority: 20
     ctx.token :NULL, /null/, priority: 20
-    
+
     # Identifiers (lower priority than keywords)
     ctx.token :IDENTIFIER, /[a-zA-Z_][a-zA-Z0-9_]*/, priority: 10
-    
+
     # Numbers (integers and floats)
     ctx.token :NUMBER, /\d+(\.\d+)?/, priority: 10
-    
+
     # Strings (single and double quoted)
     ctx.token :STRING, /"([^"\\]|\\.)*"|'([^'\\]|\\.)*'/, priority: 10
-    
+
     # Multi-character operators
     ctx.token :TRIPLE_EQUALS, /===/, priority: 15
     ctx.token :DOUBLE_EQUALS, /==/, priority: 14
@@ -94,7 +94,7 @@ def create_mini_js_lexer
     ctx.token :ARROW, /=>/, priority: 14
     ctx.token :AND, /&&/, priority: 14
     ctx.token :OR, /\|\|/, priority: 14
-    
+
     # Single character operators
     ctx.token :PLUS, /\+/, priority: 5
     ctx.token :MINUS, /-/, priority: 5
@@ -105,7 +105,7 @@ def create_mini_js_lexer
     ctx.token :LESS_THAN, /</, priority: 5
     ctx.token :GREATER_THAN, />/, priority: 5
     ctx.token :NOT, /!/, priority: 5
-    
+
     # Punctuation
     ctx.token :LPAREN, /\(/
     ctx.token :RPAREN, /\)/
@@ -117,7 +117,7 @@ def create_mini_js_lexer
     ctx.token :COMMA, /,/
     ctx.token :DOT, /\./
     ctx.token :COLON, /:/
-    
+
     # Whitespace and comments (skip)
     ctx.token :WHITESPACE, /[ \t]+/, skip: true
     ctx.token :NEWLINE, /\n/, skip: true
@@ -133,20 +133,20 @@ runner = Hecate::Lex::ExampleRunner.new(lexer, "Mini JavaScript Lexer")
 runner.configure do |r|
   # Set up token formatting for literals
   r.formatter.add_literal_types(
-    MiniJSTokens::IDENTIFIER, 
-    MiniJSTokens::NUMBER, 
+    MiniJSTokens::IDENTIFIER,
+    MiniJSTokens::NUMBER,
     MiniJSTokens::STRING
   )
-  
+
   # Custom formatter for comments
   r.formatter.set_custom_handler(MiniJSTokens::COMMENT) do |token, lexeme|
     preview = lexeme.size > 30 ? lexeme[0..27] + "..." : lexeme
     "#{token.kind}(#{preview.inspect})"
   end
-  
+
   # Use detailed output format
   r.output_format = Hecate::Lex::ExampleRunner::OutputFormat::Detailed
-  
+
   # Show statistics
   r.show_statistics = true
 end

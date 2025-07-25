@@ -19,18 +19,18 @@ module Hecate::Core::TestUtils::Matchers
     def match(actual : Array(Hecate::Core::Diagnostic)) : Bool
       actual.any? do |diag|
         severity_matches = diag.severity == @expected_severity
-        message_matches = @expected_message.nil? || 
-          case msg = @expected_message
-          when String
-            diag.message == msg
-          when Regex
-            diag.message.matches?(msg)
-          else
-            true
-          end
-        span_matches = @expected_span.nil? || 
-          diag.labels.any? { |label| label.span == @expected_span }
-        
+        message_matches = @expected_message.nil? ||
+                          case msg = @expected_message
+                          when String
+                            diag.message == msg
+                          when Regex
+                            diag.message.matches?(msg)
+                          else
+                            true
+                          end
+        span_matches = @expected_span.nil? ||
+                       diag.labels.any? { |label| label.span == @expected_span }
+
         severity_matches && message_matches && span_matches
       end
     end
@@ -55,7 +55,7 @@ module Hecate::Core::TestUtils::Matchers
     end
 
     def match(actual : Hecate::Core::Span) : Bool
-      actual.start_byte == @expected_start && actual.length == @expected_length && 
+      actual.start_byte == @expected_start && actual.length == @expected_length &&
         (@source_id == 0_u32 || actual.source_id == @source_id)
     end
 
@@ -97,7 +97,7 @@ module Hecate::Core::TestUtils::Helpers
 
   # Create a diagnostic builder for more complex diagnostics
   def diagnostic_builder(severity : Hecate::Core::Diagnostic::Severity,
-                        message : String) : Hecate::Core::DiagnosticBuilder
+                         message : String) : Hecate::Core::DiagnosticBuilder
     Hecate::Core.diagnostic(severity, message)
   end
 
@@ -122,7 +122,7 @@ module Hecate::Core::TestUtils::Helpers
   def with_temp_dir(&block)
     temp_dir = File.tempname("hecate_test")
     Dir.mkdir_p(temp_dir)
-    
+
     original_dir = Dir.current
     begin
       Dir.cd(temp_dir)
@@ -145,15 +145,15 @@ end
 # Extend Expectation for custom matchers
 struct Spec::Expectation(T)
   # Check if diagnostics contain expected diagnostic
-  def to(have_diagnostic : Hecate::Core::TestUtils::Matchers::DiagnosticMatcher, 
-        file = __FILE__, line = __LINE__)
+  def to(have_diagnostic : Hecate::Core::TestUtils::Matchers::DiagnosticMatcher,
+         file = __FILE__, line = __LINE__)
     unless have_diagnostic.match(@target)
       fail(have_diagnostic.failure_message(@target), file, line)
     end
   end
 
   def not_to(have_diagnostic : Hecate::Core::TestUtils::Matchers::DiagnosticMatcher,
-            file = __FILE__, line = __LINE__)
+             file = __FILE__, line = __LINE__)
     if have_diagnostic.match(@target)
       fail(have_diagnostic.negative_failure_message(@target), file, line)
     end
@@ -161,7 +161,7 @@ struct Spec::Expectation(T)
 
   # Check if span matches expected values
   def to(match_span : Hecate::Core::TestUtils::Matchers::SpanMatcher,
-        file = __FILE__, line = __LINE__)
+         file = __FILE__, line = __LINE__)
     unless match_span.match(@target)
       fail(match_span.failure_message(@target), file, line)
     end

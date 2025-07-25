@@ -75,7 +75,7 @@ module Hecate::Core
   end
 
   # Module-level factory methods for creating DiagnosticBuilder instances
-  
+
   # Create an error diagnostic builder
   def self.error(message : String) : DiagnosticBuilder
     DiagnosticBuilder.new(Diagnostic.new(Diagnostic::Severity::Error, message))

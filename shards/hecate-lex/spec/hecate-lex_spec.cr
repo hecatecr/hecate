@@ -1,5 +1,4 @@
 require "./spec_helper"
-require "hecate-core/test_utils"
 
 describe Hecate::Lex do
   it "has a version" do
@@ -7,7 +6,7 @@ describe Hecate::Lex do
   end
 
   describe "test utilities integration" do
-    it "can create test spans" do  
+    it "can create test spans" do
       test_span = span(10, 5)
       test_span.should be_a(Hecate::Core::Span)
       test_span.start_byte.should eq(10)
@@ -33,9 +32,9 @@ describe Hecate::Lex do
 
     it "supports diagnostic matchers" do
       diagnostics = [
-        diagnostic(Hecate::Core::Diagnostic::Severity::Error, "test error", span(0, 5))
+        diagnostic(Hecate::Core::Diagnostic::Severity::Error, "test error", span(0, 5)),
       ]
-      
+
       diagnostics.should have_error("test error")
       diagnostics.should_not have_warning
     end

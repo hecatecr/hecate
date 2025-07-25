@@ -76,7 +76,7 @@ describe Hecate::Core::Position do
         Hecate::Core::Position.new(2, 5),
         Hecate::Core::Position.new(1, 10),
         Hecate::Core::Position.new(1, 5),
-        Hecate::Core::Position.new(3, 0)
+        Hecate::Core::Position.new(3, 0),
       ]
 
       sorted = positions.sort

@@ -10,13 +10,13 @@ lexer = Hecate::Lex.define do |ctx|
   ctx.token :IF, /if/, priority: 20
   ctx.token :THEN, /then/, priority: 20
   ctx.token :ELSE, /else/, priority: 20
-  
+
   # Identifiers and literals
   ctx.token :ID, /[a-zA-Z_][a-zA-Z0-9_]*/, priority: 10
   ctx.token :NUM, /\d+(\.\d+)?/, priority: 10
   ctx.token :STR, /"([^"\\]|\\.)*"/, priority: 10
-  
-  # Operators  
+
+  # Operators
   ctx.token :PLUS, /\+/
   ctx.token :MINUS, /-/
   ctx.token :TIMES, /\*/
@@ -24,11 +24,11 @@ lexer = Hecate::Lex.define do |ctx|
   ctx.token :EQ, /=/
   ctx.token :LT, /</
   ctx.token :GT, />/
-  
+
   # Delimiters
   ctx.token :LPAREN, /\(/
   ctx.token :RPAREN, /\)/
-  
+
   # Whitespace
   ctx.token :WS, /\s+/, skip: true
 end
@@ -51,10 +51,10 @@ end
 Hecate::Lex::CLI.print_header("Tokens")
 tokens.each do |token|
   next if token.kind_name == "EOF"
-  
+
   pos = source_file.byte_to_position(token.span.start_byte)
   lexeme = token.lexeme(source_file)
-  
+
   # Format based on token type
   case token.kind_name
   when "ID", "NUM", "STR"
@@ -67,6 +67,6 @@ end
 # Print summary
 puts
 Hecate::Lex::CLI.print_summary({
-  "Total Tokens" => tokens.size - 1,  # Exclude EOF
-  "Diagnostics" => diagnostics.size
+  "Total Tokens" => tokens.size - 1, # Exclude EOF
+  "Diagnostics"  => diagnostics.size,
 })

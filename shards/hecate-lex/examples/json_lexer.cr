@@ -57,20 +57,20 @@ runner = Hecate::Lex::ExampleRunner.new(lexer, "JSON Lexer")
 runner.configure do |r|
   # Set up token formatting
   r.formatter.add_literal_types(JSONTokens::STRING, JSONTokens::NUMBER)
-  
+
   # Use structured output for JSON
   r.output_format = Hecate::Lex::ExampleRunner::OutputFormat::Structured
-  
+
   # Set up nesting tracker for proper indentation
   r.nesting_tracker = Hecate::Lex::NestingTracker.new(
     open_tokens: [JSONTokens::LBRACE, JSONTokens::LBRACKET],
     close_tokens: [JSONTokens::RBRACE, JSONTokens::RBRACKET],
     pairs: {
-      JSONTokens::RBRACE => JSONTokens::LBRACE,
-      JSONTokens::RBRACKET => JSONTokens::LBRACKET
+      JSONTokens::RBRACE   => JSONTokens::LBRACE,
+      JSONTokens::RBRACKET => JSONTokens::LBRACKET,
     }
   )
-  
+
   # Enable structure validation
   r.show_structure_validation = true
   r.show_statistics = true

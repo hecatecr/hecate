@@ -25,16 +25,16 @@ module Hecate::Lex
   struct Rule(T)
     # The token kind this rule produces
     getter kind : T
-    
+
     # The regex pattern to match against
     getter pattern : Regex
-    
+
     # Whether tokens from this rule should be skipped in output
     getter skip : Bool
-    
+
     # Priority for conflict resolution (higher = more important)
     getter priority : Int32
-    
+
     # Optional error handler for this rule
     getter error_handler : Symbol?
 
@@ -45,7 +45,7 @@ module Hecate::Lex
     # - *skip*: Whether to skip tokens from this rule (default: false)
     # - *priority*: Priority for conflict resolution (default: 0)
     # - *error_handler*: Optional error handler symbol (default: nil)
-    def initialize(@kind : T, pattern : String | Regex, 
+    def initialize(@kind : T, pattern : String | Regex,
                    @skip = false, @priority = 0, @error_handler = nil)
       @pattern = pattern.is_a?(String) ? Regex.new(pattern) : pattern
     end
@@ -68,7 +68,7 @@ module Hecate::Lex
     # ```
     def match_at(text : String, pos : Int32) : Regex::MatchData?
       return nil if pos >= text.size
-      
+
       # Performance optimization: use original pattern and check match position
       # instead of creating new anchored regex each time
       if match = @pattern.match(text, pos)
@@ -77,7 +77,7 @@ module Hecate::Lex
           return match
         end
       end
-      
+
       nil
     end
   end
@@ -97,7 +97,7 @@ module Hecate::Lex
   class RuleSet(T)
     # Array of rules sorted by priority (highest first)
     getter rules : Array(Rule(T))
-    
+
     # Hash of registered error handlers
     getter error_handlers : Hash(Symbol, LexErrorHandler)
 
@@ -107,7 +107,7 @@ module Hecate::Lex
       @error_handlers = {} of Symbol => LexErrorHandler
       register_default_error_handlers
     end
-    
+
     # Registers the default common error handlers
     private def register_default_error_handlers
       @error_handlers[:unterminated_string] = CommonErrors::UNTERMINATED_STRING

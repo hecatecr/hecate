@@ -65,11 +65,11 @@ describe "Hecate::Lex DSL" do
     end
   end
 
-  describe "error method" do  
+  describe "error method" do
     it "registers error handlers" do
       lexer = Hecate::Lex.define do |ctx|
         ctx.token :STRING, /"[^"]*"/
-        
+
         ctx.error :UNTERMINATED_STRING do |input, pos|
           Hecate.error("unterminated string")
             .primary(Span.new(0_u32, pos, input.size), "string starts here")
@@ -108,12 +108,12 @@ describe "Hecate::Lex DSL" do
       source_map = SourceMap.new
       source_id = source_map.add_file("test.txt", "if (x + 1) else y")
       source_file = source_map.get(source_id).not_nil!
-      
+
       tokens, diagnostics = lexer.scan(source_file)
-      
+
       diagnostics.should be_empty
       tokens.size.should eq(8)
-      
+
       expected_lexemes = ["if", "(", "x", "+", "1", ")", "else", "y"]
       actual_lexemes = tokens.map(&.lexeme(source_file))
       actual_lexemes.should eq(expected_lexemes)

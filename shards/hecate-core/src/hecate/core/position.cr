@@ -1,8 +1,8 @@
 module Hecate::Core
   # Represents a position in a source file as line and column numbers (zero-based internally)
   struct Position
-    getter line : Int32    # 0-based internally
-    getter column : Int32  # 0-based internally
+    getter line : Int32   # 0-based internally
+    getter column : Int32 # 0-based internally
 
     def initialize(@line : Int32, @column : Int32)
     end

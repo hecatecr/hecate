@@ -1,7 +1,6 @@
 require "hecate-core"
 
 module Hecate::Lex
-
   # Context class that captures DSL definitions
   private class DSLContext(T)
     getter rules = [] of Rule(T)
@@ -38,7 +37,7 @@ module Hecate::Lex
     @symbol_to_int = {} of String => Int32
     @int_to_symbol = {} of Int32 => String
     @next_id = 0
-    @rules = [] of Rule(Int32) 
+    @rules = [] of Rule(Int32)
     @error_handlers = {} of Int32 => Proc(String, Int32, Hecate::Core::Diagnostic)
 
     # Define a token rule with dynamic enum creation
@@ -128,14 +127,14 @@ module Hecate::Lex
           # No rule matched - this is a lexical error
           char = input[position]
           char_span = Hecate::Core::Span.new(source_file.id, position, position + 1)
-          
+
           diagnostic = Hecate.error("unexpected character")
             .primary(char_span, "unexpected '#{char}'")
             .help("remove this character or add a lexer rule to handle it")
             .build
 
           diagnostics << diagnostic
-          position += 1  # Skip the problematic character and continue
+          position += 1 # Skip the problematic character and continue
         end
       end
 

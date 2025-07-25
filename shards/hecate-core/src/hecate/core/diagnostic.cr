@@ -73,11 +73,11 @@ module Hecate::Core
     # Format the diagnostic for display
     def to_s(io : IO) : Nil
       io << severity.to_s.downcase << ": " << message
-      
+
       if help_msg = @help
         io << "\nhelp: " << help_msg
       end
-      
+
       @notes.each do |note|
         io << "\nnote: " << note
       end
@@ -123,14 +123,14 @@ module Hecate::Core
       # Extract lines
       lines = source.content.lines
       line_range = (start_pos.line..end_pos.line)
-      
+
       # Print lines with indicators
       line_range.each do |line_idx|
         next if line_idx >= lines.size
-        
+
         line = lines[line_idx]
         line_num = line_idx + 1
-        
+
         # Line number and content
         io.printf "   \e[34m%3d |\e[0m %s\n", line_num, line.chomp
 
@@ -157,7 +157,7 @@ module Hecate::Core
     private def print_underline(io : IO, start_col : Int32, length : Int32, label : Label) : Nil
       io.print "       \e[34m|\e[0m "
       io.print " " * start_col
-      
+
       case label.style
       when Label::Style::Primary
         io.print "\e[31;1m"
@@ -166,11 +166,11 @@ module Hecate::Core
         io.print "\e[33m"
         io.print "-" * length
       end
-      
+
       if !label.message.empty?
         io.print " #{label.message}"
       end
-      
+
       io.print "\e[0m\n"
     end
   end

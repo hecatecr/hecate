@@ -20,7 +20,7 @@ renderer = Hecate::Core::TTYRenderer.new(STDOUT, 80)
 
 # Example 1: Simple error with primary label
 puts "=== Example 1: Simple Error ==="
-span1 = Hecate::Core::Span.new(source_id, 14, 15)  # 'x' parameter
+span1 = Hecate::Core::Span.new(source_id, 14, 15) # 'x' parameter
 diagnostic1 = Hecate::Core::Diagnostic.new(
   Hecate::Core::Diagnostic::Severity::Error,
   "undefined variable"
@@ -32,9 +32,9 @@ renderer.emit(diagnostic1, source_map)
 puts
 
 # Example 2: Warning with multiple labels
-puts "=== Example 2: Multiple Labels ===" 
-span2a = Hecate::Core::Span.new(source_id, 14, 15)  # 'x' parameter
-span2b = Hecate::Core::Span.new(source_id, 17, 18)  # 'y' parameter
+puts "=== Example 2: Multiple Labels ==="
+span2a = Hecate::Core::Span.new(source_id, 14, 15) # 'x' parameter
+span2b = Hecate::Core::Span.new(source_id, 17, 18) # 'y' parameter
 diagnostic2 = Hecate::Core::Diagnostic.new(
   Hecate::Core::Diagnostic::Severity::Warning,
   "unused parameters"

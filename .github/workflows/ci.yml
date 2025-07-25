@@ -76,7 +76,7 @@ jobs:
           crystal: latest
       
       - name: Install just
-        uses: extractions/setup-just@v2
+        uses: extractions/setup-just@v3
       
       - name: Cache shards
         uses: actions/cache@v4

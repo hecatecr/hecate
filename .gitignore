@@ -5,6 +5,7 @@
 *.dwarf
 /.crystal/
 shard.lock
+/docs/
 
 # Build artifacts
 *.o

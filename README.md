@@ -127,7 +127,7 @@ done
 - [ ] LLVM backend
 - [ ] WASM backend
 
-See the [full roadmap](docs/ROADMAP.md) for more details.
+See the [full roadmap](ROADMAP.md) for more details.
 
 ## Contributing
 

@@ -345,14 +345,13 @@ Benchmarks show 100k+ tokens/second on typical source code.
 
 ## Contributing
 
-1. Fork it (https://github.com/hecatecr/hecate-lex/fork)
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Add comprehensive tests for new functionality
-4. Ensure all tests pass (`crystal spec`)
-5. Follow Crystal coding conventions
-6. Commit your changes (`git commit -am 'Add some feature'`)
-7. Push to the branch (`git push origin my-new-feature`)
-8. Create a new Pull Request
+This repository is a read-only mirror. All development happens in the [Hecate monorepo](https://github.com/hecatecr/hecate).
+
+- **Issues**: Please file issues in the [main repository](https://github.com/hecatecr/hecate/issues)
+- **Pull Requests**: Submit PRs to the [monorepo](https://github.com/hecatecr/hecate)
+- **Development**: Clone the monorepo for local development
+
+Changes made here will be overwritten by the next automated release.
 
 ## License
 

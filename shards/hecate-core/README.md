@@ -222,13 +222,13 @@ crystal docs
 
 ## Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Write tests for your changes
-4. Ensure all tests pass (`crystal spec`)
-5. Commit your changes (`git commit -am 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Create a Pull Request
+This repository is a read-only mirror. All development happens in the [Hecate monorepo](https://github.com/hecatecr/hecate).
+
+- **Issues**: Please file issues in the [main repository](https://github.com/hecatecr/hecate/issues)
+- **Pull Requests**: Submit PRs to the [monorepo](https://github.com/hecatecr/hecate)
+- **Development**: Clone the monorepo for local development
+
+Changes made here will be overwritten by the next automated release.
 
 ## License
 

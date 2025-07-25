@@ -154,6 +154,14 @@ push-all branch="main":
     @just push-shard lex {{branch}}
     @echo "✅ All shards pushed successfully"
 
+# Push all changes (monorepo + shards)
+push-everything:
+    @echo "📤 Pushing monorepo changes..."
+    @git push origin main
+    @echo "🚀 Pushing all shards..."
+    @just push-all
+    @echo "✅ Everything pushed successfully!"
+
 # Force push a shard (use with caution!)
 force-push-shard shard branch="main":
     @echo "⚠️  Force pushing {{shard}} to {{branch}}..."
@@ -204,6 +212,15 @@ status:
     @echo ""
     @echo "hecate-lex:"
     @git log --oneline -5 -- shards/hecate-lex | head -5 || echo "  No recent changes"
+
+# Check full status including monorepo
+status-all:
+    @echo "📊 Full repository status:"
+    @echo ""
+    @echo "🏠 Monorepo (unpushed commits):"
+    @git log --oneline -5 --branches --not --remotes || echo "  All changes pushed"
+    @echo ""
+    @just status
 
 # Show help for subtree workflow
 subtree-help:

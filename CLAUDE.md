@@ -32,23 +32,43 @@ hecate/
 - Each shard is independently versioned and published
 
 #### Local Development Dependencies
-For local development, internal shard dependencies should be declared in `shard.yml` using path references:
+**IMPORTANT**: The monorepo uses a dual shard configuration for development vs production:
 
+1. **Production shards** (`shards/*/shard.yml`) - Point to GitHub repositories
+2. **Development shards** (`shard.dev.yml` at root) - Use local path dependencies
+3. **Root shard.yml** - Aggregates all local shards for development
+
+**Development Setup**:
+```bash
+# The justfile automatically sets SHARDS_OVERRIDE=shard.dev.yml
+# This makes all commands use local development dependencies
+
+# Install development dependencies (one time setup)
+just install
+
+# All commands now run from root and use local shards
+# Dependencies are automatically ensured before testing
+just test
+just bench-lexer
+just example-json
+```
+
+**Production vs Development**:
 ```yaml
-# In shards/hecate-lex/shard.yml
+# shards/hecate-lex/shard.yml (production)
 dependencies:
   hecate-core:
-    path: ../hecate-core
+    github: hecatecr/hecate-core
+
+# shard.dev.yml (development override)  
+dependencies:
+  hecate-core:
+    path: shards/hecate-core
+  hecate-lex:
+    path: shards/hecate-lex
 ```
 
-This allows you to require dependencies normally:
-```crystal
-# In specs or source files
-require "hecate-core"
-require "hecate-core/test_utils"  # Instead of relative paths
-```
-
-**Never use relative paths** like `require "../../hecate-core/src/..."` in specs or source. Always declare the dependency in shard.yml and require by shard name.
+**Never use relative paths** in require statements. Always use shard names like `require "hecate-core"`.
 
 #### Test Utilities
 For enhanced testing capabilities, require the test utils from hecate-core:
@@ -78,30 +98,26 @@ crystal build src/example.cr
 
 ### Testing
 ```bash
-# IMPORTANT: Always run the full test suite before committing changes
-# This catches compilation errors and regressions across all shards
+# IMPORTANT: Always run from the monorepo root using development shards
 
 # Run all tests across all shards (REQUIRED before committing)
-find shards -name "spec" -type d | while read dir; do
-  echo "Testing $(dirname $dir)..."
-  (cd $(dirname $dir) && crystal spec) || exit 1
-done
+just test
 
-# Verify compilation of all shards without running tests
-find shards -name "src" -type d | while read dir; do
-  echo "Checking compilation of $(dirname $dir)..."
-  (cd $(dirname $dir) && crystal build --no-codegen src/**/*.cr) || exit 1
-done
+# Run tests for a specific shard during development  
+just test-shard core
+just test-shard lex
 
-# Run tests for a specific shard during development
-cd shards/<shard-name>
-crystal spec
+# Check compilation without running tests
+just check
 
-# Run specific test file
-crystal spec spec/specific_spec.cr
+# Run specific test file from root
+crystal spec shards/hecate-core/spec/specific_spec.cr --error-on-warnings
 
 # Run with verbose output
-crystal spec --verbose
+crystal spec shards/hecate-lex/spec --verbose --error-on-warnings
+
+# Full project validation (tests + benchmarks + examples)
+just validate
 ```
 
 ### Building
@@ -115,21 +131,22 @@ crystal build --release src/<shard-name>.cr
 ```
 
 ### Running Examples
-**IMPORTANT**: Always run examples from the shard's root directory, not from the monorepo root or the examples directory itself.
+**IMPORTANT**: Always run examples from the monorepo root directory using the justfile commands or full paths.
 
 ```bash
-# CORRECT: Run from the shard's root directory
-cd shards/hecate-lex
-crystal run examples/json_lexer.cr -- examples/sample.json
+# CORRECT: Use justfile commands (recommended)
+just example-json
+just example-js
+just example-dynamic
 
-# WRONG: Don't run from monorepo root
-# crystal run shards/hecate-lex/examples/json_lexer.cr
+# CORRECT: Run from monorepo root with full paths
+crystal run shards/hecate-lex/examples/json_lexer.cr -- shards/hecate-lex/examples/sample.json
 
-# WRONG: Don't run from examples directory
-# cd shards/hecate-lex/examples && crystal run json_lexer.cr
+# WRONG: Don't cd into shard directories
+# cd shards/hecate-lex && crystal run examples/json_lexer.cr
 ```
 
-This ensures proper dependency resolution and path handling.
+This ensures proper dependency resolution using the development shard configuration.
 
 ## Crystal Conventions for This Project
 
@@ -171,6 +188,22 @@ Examples:
 - Snapshot testing for diagnostic output
 - Golden file testing for AST/IR representations
 - Property-based testing for lexer/parser edge cases
+
+#### Golden File Testing
+Golden files are stored within each shard at `spec/fixtures/golden/`:
+```
+shards/hecate-lex/
+  spec/
+    fixtures/
+      golden/
+        lexer/         # Golden files for lexer tests
+          json/
+          language/
+          edge/
+          error/
+```
+
+This ensures each shard is self-contained when published as a separate repository.
 
 ## Key Design Patterns
 
@@ -257,9 +290,9 @@ end
 5. Add to CI matrix
 
 ### Making Changes
-1. Work in the specific shard directory
+1. **Always work from the monorepo root directory**
 2. Add tests for all new functionality BEFORE implementation
-3. Run tests for the specific shard during development
+3. Run tests for the specific shard during development using `just test-shard <name>`
 4. **Run the full test suite across ALL shards before committing**
    - This catches compilation errors in dependent shards
    - Ensures no regressions were introduced
@@ -268,27 +301,53 @@ end
 
 **Testing Workflow:**
 ```bash
-# 1. Add new test cases first
-cd shards/hecate-core
-crystal spec spec/new_feature_spec.cr  # Should fail
+# 1. Add new test cases first (from root directory)
+crystal spec shards/hecate-core/spec/new_feature_spec.cr  # Should fail
 
-# 2. Implement the feature
-# ... make your changes ...
+# 2. Implement the feature in the appropriate shard
+# ... make your changes to shards/hecate-core/src/ ...
 
 # 3. Verify local tests pass
-crystal spec  # All tests in current shard
+just test-shard core
 
-# 4. CRITICAL: Run full test suite
-cd ../..  # Back to project root
-find shards -name "spec" -type d | while read dir; do
-  (cd $(dirname $dir) && crystal spec) || exit 1
-done
+# 4. CRITICAL: Run full test suite (from root)
+just test
+
+# 5. Optional: Run full validation
+just validate  # Tests + benchmarks + examples
 ```
 
 ### Release Process
-- Automated via `tools/release.rb`
-- Subtree mirrors pushed to `hecatecr/<shard-name>`
-- Version bumps triggered by release commits
+
+The monorepo uses Git subtrees to publish individual shards to separate repositories.
+
+#### Git Subtree Setup
+Each shard in `shards/` is pushed to its own read-only repository:
+- `shards/hecate-core/` → `github.com/hecatecr/hecate-core`
+- `shards/hecate-lex/` → `github.com/hecatecr/hecate-lex`
+- etc.
+
+#### Release Workflow
+```bash
+# Check what would be pushed
+just status
+
+# Push individual shard updates
+just push-shard core
+just push-shard lex
+
+# Push all shards at once
+just push-all
+
+# Create a tagged release
+just release 0.1.0  # Creates v0.1.0 tag and pushes to all repos
+```
+
+#### Important Notes
+- **All development happens in the monorepo** - individual repos are read-only
+- **Issues and PRs** should be filed against the monorepo, not individual shards
+- **Subtree pushes** extract only relevant files and history for each shard
+- **Force pushes** may be needed for the initial population: `just force-push-shard core`
 
 ## Crystal Documentation and Help
 

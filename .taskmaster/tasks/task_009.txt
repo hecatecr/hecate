@@ -1,0 +1,98 @@
+# Task ID: 9
+# Title: Implement Source Code Snippet Rendering
+# Status: pending
+# Dependencies: 8
+# Priority: medium
+# Description: Add code snippet extraction and formatting with line numbers and label annotations
+# Details:
+Extend TTYRenderer with snippet rendering:
+```crystal
+private def emit_source_section(source, labels, source_map)
+  # Sort labels by span start position
+  sorted_labels = labels.sort_by { |l| l.span.start_byte }
+  
+  # Calculate line range to display
+  lines_to_show = calculate_context_lines(sorted_labels, source)
+  
+  # Emit file path
+  @output.puts " --> #{source.path}"
+  
+  lines_to_show.each do |line_num|
+    line_text = source.get_line(line_num)
+    relevant_labels = labels.select { |l| label_on_line?(l, line_num, source) }
+    
+    # Format: "  12 | let x = 42"
+    @output.print sprintf(" %3d | ", line_num + 1)
+    @output.puts line_text
+    
+    # Emit label underlines
+    if relevant_labels.any?
+      emit_label_underlines(line_text, relevant_labels, source)
+    end
+  end
+end
+
+private def emit_label_underlines(line_text, labels, source)
+  # Calculate column positions and render ^^^^ with messages
+  # Handle overlapping labels with proper spacing
+end
+```
+
+# Test Strategy:
+Test multi-line spans, overlapping labels, edge cases (first/last line), Unicode character width handling
+
+# Subtasks:
+## 1. Extract and Sort Label Positions [pending]
+### Dependencies: None
+### Description: Implement label sorting and position extraction logic for source snippets
+### Details:
+Create helper methods to sort labels by span position and extract relevant position data:
+- Sort labels by start_byte position
+- Group overlapping labels for proper rendering
+- Extract byte positions and convert to line/column coordinates
+- Handle multi-line spans that cross line boundaries
+
+## 2. Calculate Context Line Range [pending]
+### Dependencies: 9.1
+### Description: Implement calculate_context_lines method to determine which lines to display
+### Details:
+Implement logic to calculate the range of lines to show:
+- Find minimum and maximum line numbers from all labels
+- Add configurable context padding (e.g., 2 lines before/after)
+- Handle edge cases at file start/end
+- Return a Range or Array of line numbers to display
+
+## 3. Format Line Display with Numbers [pending]
+### Dependencies: 9.2
+### Description: Implement line formatting with proper line number padding and syntax
+### Details:
+Create the line display formatting:
+- Calculate maximum line number width for consistent padding
+- Format line numbers with proper spacing (e.g., ' 12 | ')
+- Retrieve line text from source using line number
+- Handle empty lines and lines with only whitespace
+- Implement label_on_line? helper to check if label affects a line
+
+## 4. Render Label Underlines and Messages [pending]
+### Dependencies: 9.3
+### Description: Implement emit_label_underlines to draw carets and messages under code
+### Details:
+Implement the underline rendering logic:
+- Calculate column positions for each label on the line
+- Generate '^' characters for primary labels, '~' for secondary
+- Handle overlapping labels with vertical offset spacing
+- Align label messages with their underlines
+- Account for tab characters and Unicode character widths
+- Use ANSI colors matching label styles
+
+## 5. Handle Multi-line Spans and Edge Cases [pending]
+### Dependencies: 9.4
+### Description: Implement support for labels spanning multiple lines and handle edge cases
+### Details:
+Complete the implementation with multi-line support:
+- Render continuation markers for spans crossing lines
+- Handle labels that start/end mid-line
+- Implement proper spacing between code sections
+- Handle very long label messages with wrapping
+- Ensure consistent output format with emit_header integration
+

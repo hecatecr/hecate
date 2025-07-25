@@ -1,4 +1,6 @@
-# Hecate
+<p align="center">
+  <img src="https://github.com/hecatecr/hecate/raw/refs/heads/main/assets/logo.png" width="300" />
+</p>
 
 [![CI](https://github.com/hecatecr/hecate/workflows/CI/badge.svg)](https://github.com/hecatecr/hecate/actions)
 [![Crystal Version](https://img.shields.io/badge/crystal-latest-brightgreen)](https://crystal-lang.org/)

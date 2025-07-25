@@ -182,12 +182,12 @@ module Hecate::Core
         if caller_location.nil?
           raise "Could not determine spec file location"
         end
-        
+
         # Extract the file path from the caller location
         # Format is like "path/to/file.cr:123:4 in 'method'"
         spec_file = caller_location.split(':').first
         spec_file_dir = File.dirname(spec_file)
-        
+
         # Walk up to find the spec directory
         current = spec_file_dir
         loop do
@@ -198,7 +198,7 @@ module Hecate::Core
           break if parent == current
           current = parent
         end
-        
+
         raise "Could not find spec directory"
       end
 

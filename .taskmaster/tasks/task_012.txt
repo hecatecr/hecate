@@ -1,0 +1,69 @@
+# Task ID: 12
+# Title: Design Token Data Structure
+# Status: pending
+# Dependencies: 11
+# Priority: high
+# Description: Create Token type with kind, span, and optional semantic value
+# Details:
+Create src/hecate/lex/token.cr:
+```crystal
+module Hecate::Lex
+  struct Token(T)
+    getter kind : T
+    getter span : Hecate::Core::Span
+    getter value : String?
+    
+    def initialize(@kind : T, @span : Hecate::Core::Span, @value : String? = nil)
+    end
+    
+    # Lazy lexeme retrieval from source map
+    def lexeme(source_map : Hecate::Core::SourceMap) : String
+      if source = source_map.get(@span.source_id)
+        source.contents[@span.start_byte...@span.end_byte]
+      else
+        @value || "<unknown>"
+      end
+    end
+    
+    def ==(other : Token(T)) : Bool
+      @kind == other.kind && @span == other.span
+    end
+  end
+end
+```
+Generic over token kind enum to support compile-time type safety.
+
+# Test Strategy:
+Test token creation, equality comparison, lexeme extraction from source map, edge cases with missing sources
+
+# Subtasks:
+## 1. Create Token Module Structure [pending]
+### Dependencies: None
+### Description: Set up the basic module structure and file organization for the Token type in hecate-lex shard
+### Details:
+Create the src/hecate/lex/token.cr file with proper module namespace (Hecate::Lex). Ensure the file includes proper Crystal documentation comments and follows the project's module organization conventions. Add necessary require statements for Hecate::Core::Span and Hecate::Core::SourceMap dependencies.
+
+## 2. Implement Token Struct with Generic Type [pending]
+### Dependencies: 12.1
+### Description: Create the generic Token struct with kind, span, and optional value fields
+### Details:
+Implement Token(T) as a generic struct with three getter properties: kind (of type T), span (Hecate::Core::Span), and value (String?). Add the initialize method that accepts these three parameters with value defaulting to nil. Ensure the struct is immutable by using getter macros only.
+
+## 3. Implement Lexeme Retrieval Method [pending]
+### Dependencies: 12.2
+### Description: Add the lexeme method for lazy retrieval of token text from source map
+### Details:
+Implement the lexeme method that accepts a SourceMap parameter and returns the substring from the source file based on the token's span byte offsets. Handle edge cases where the source_id doesn't exist in the map by falling back to the stored value or '<unknown>'. Use byte-based slicing for accurate UTF-8 handling.
+
+## 4. Implement Token Equality Comparison [pending]
+### Dependencies: 12.2
+### Description: Add equality operator for comparing tokens based on kind and span
+### Details:
+Implement the == operator that compares two Token(T) instances. Tokens are considered equal if both their kind and span are equal. The optional value field is intentionally excluded from equality comparison to ensure consistent behavior regardless of whether lexeme was cached.
+
+## 5. Create Comprehensive Token Tests [pending]
+### Dependencies: 12.3, 12.4
+### Description: Write spec file with complete test coverage for all Token functionality
+### Details:
+Create spec/hecate/lex/token_spec.cr with tests covering: token construction with various enum types, lexeme retrieval from real and missing sources, equality comparison edge cases, generic type behavior with different token kind enums, and performance characteristics of lazy lexeme loading.
+

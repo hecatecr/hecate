@@ -1,0 +1,84 @@
+# Task ID: 7
+# Title: Implement Diagnostic Builder API
+# Status: pending
+# Dependencies: 6
+# Priority: medium
+# Description: Create fluent builder API for constructing diagnostics with method chaining
+# Details:
+Extend diagnostic.cr with builder pattern:
+```crystal
+module Hecate::Core
+  class DiagnosticBuilder
+    def initialize(@diagnostic : Diagnostic)
+    end
+    
+    def primary(span : Span, message : String) : self
+      @diagnostic.labels << Label.new(span, message, Label::LabelStyle::Primary)
+      self
+    end
+    
+    def secondary(span : Span, message : String) : self
+      @diagnostic.labels << Label.new(span, message, Label::LabelStyle::Secondary)
+      self
+    end
+    
+    def help(text : String) : self
+      @diagnostic.help = text
+      self
+    end
+    
+    def note(text : String) : self
+      @diagnostic.notes << text
+      self
+    end
+    
+    def build : Diagnostic
+      @diagnostic
+    end
+  end
+  
+  # Module-level helper methods
+  def self.error(message : String) : DiagnosticBuilder
+    DiagnosticBuilder.new(Diagnostic.new(Severity::Error, message))
+  end
+  
+  def self.warning(message : String) : DiagnosticBuilder
+    DiagnosticBuilder.new(Diagnostic.new(Severity::Warning, message))
+  end
+end
+```
+
+# Test Strategy:
+Test builder method chaining, verify each method returns self, ensure built diagnostic has all configured properties
+
+# Subtasks:
+## 1. Define DiagnosticBuilder Class Structure [pending]
+### Dependencies: None
+### Description: Create the base DiagnosticBuilder class with initialization and instance variable setup
+### Details:
+Implement the DiagnosticBuilder class in src/hecate/core/diagnostic_builder.cr with proper initialization that accepts a Diagnostic instance. Set up instance variables for the diagnostic being built and ensure proper module namespacing under Hecate::Core.
+
+## 2. Implement Label Builder Methods [pending]
+### Dependencies: 7.1
+### Description: Add primary() and secondary() methods for attaching labeled spans to diagnostics
+### Details:
+Implement the primary(span, message) and secondary(span, message) methods that create Label instances with appropriate LabelStyle and add them to the diagnostic's labels array. Ensure methods return self for chaining and handle multiple labels correctly.
+
+## 3. Add Help and Note Builder Methods [pending]
+### Dependencies: 7.1
+### Description: Implement help() and note() methods for adding supplementary information to diagnostics
+### Details:
+Create help(text) method that sets the diagnostic's help field and note(text) method that appends to the notes array. Both methods should return self for chaining. Handle edge cases like multiple help calls (last wins) and accumulating multiple notes.
+
+## 4. Create Module-Level Factory Methods [pending]
+### Dependencies: 7.1
+### Description: Implement error() and warning() factory methods at the module level for convenient diagnostic creation
+### Details:
+Add module-level methods Hecate::Core.error(message) and Hecate::Core.warning(message) that create DiagnosticBuilder instances with appropriate severity levels. Consider adding additional factory methods for other severity levels like info() and hint().
+
+## 5. Implement Build Method and Integration Tests [pending]
+### Dependencies: 7.2, 7.3, 7.4
+### Description: Add build() method to finalize diagnostics and create comprehensive integration tests
+### Details:
+Implement build() method that returns the configured Diagnostic instance. Create integration tests that demonstrate full builder pattern usage including complex diagnostic creation with multiple labels, help text, and notes. Update existing code to use the builder API where appropriate.
+

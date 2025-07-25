@@ -1,0 +1,82 @@
+# Task ID: 4
+# Title: Create Position and Span Types
+# Status: pending
+# Dependencies: 3
+# Priority: high
+# Description: Implement Position (line/column) and Span (source range) types with proper conversion utilities
+# Details:
+Create src/hecate/core/position.cr:
+```crystal
+module Hecate::Core
+  struct Position
+    getter line : Int32    # 0-based internally
+    getter column : Int32  # 0-based internally
+    
+    def initialize(@line, @column)
+    end
+    
+    # Convert to 1-based for display
+    def display_line : Int32
+      @line + 1
+    end
+    
+    def display_column : Int32
+      @column + 1
+    end
+  end
+end
+```
+
+Create src/hecate/core/span.cr:
+```crystal
+module Hecate::Core
+  struct Span
+    getter source_id : UInt32
+    getter start_byte : Int32
+    getter end_byte : Int32
+    
+    def initialize(@source_id, @start_byte, @end_byte)
+      raise ArgumentError.new("Invalid span") if @end_byte < @start_byte
+    end
+    
+    def length : Int32
+      @end_byte - @start_byte
+    end
+  end
+end
+```
+
+# Test Strategy:
+Unit test Position creation and display conversion. Test Span validation, length calculation, and edge cases (zero-length spans, single-byte spans).
+
+# Subtasks:
+## 1. Create Position struct with basic getters [pending]
+### Dependencies: None
+### Description: Implement the Position struct in src/hecate/core/position.cr with line and column getters
+### Details:
+Create the Position struct with @line and @column instance variables (0-based internally), implement getter methods for both fields, and add initialize method with proper parameter binding
+
+## 2. Add display conversion methods to Position [pending]
+### Dependencies: 4.1
+### Description: Implement display_line and display_column methods that convert 0-based to 1-based for user display
+### Details:
+Add display_line method that returns @line + 1 and display_column method that returns @column + 1 to convert from internal 0-based representation to 1-based display format
+
+## 3. Create Span struct with validation [pending]
+### Dependencies: None
+### Description: Implement the Span struct in src/hecate/core/span.cr with source_id, start_byte, and end_byte fields
+### Details:
+Create Span struct with @source_id (UInt32), @start_byte and @end_byte (Int32) fields, implement initialize method with ArgumentError validation when end_byte < start_byte
+
+## 4. Add length calculation to Span [pending]
+### Dependencies: 4.3
+### Description: Implement the length method for Span that calculates byte range size
+### Details:
+Add length method to Span struct that returns @end_byte - @start_byte to calculate the byte length of the span
+
+## 5. Add utility methods and integration tests [pending]
+### Dependencies: 4.2, 4.4
+### Description: Add additional utility methods for Position/Span comparison and create comprehensive integration tests
+### Details:
+Consider adding comparison operators (==, <=>), to_s methods for debugging, and potentially methods to convert between Position and byte offsets when combined with SourceFile
+

@@ -1,0 +1,260 @@
+# Hecate Language Development Toolkit - Product Requirements Document
+
+## Executive Summary
+
+Hecate is a batteries-included language development toolkit for Crystal, providing modular shards for building new programming languages and DSLs. This PRD covers the initial implementation of the Core and Lex shards, which form the foundation of the toolkit.
+
+## Project Overview
+
+### Vision
+Create a Crystal-based language development toolkit that provides Rust-style diagnostics, rapid prototyping capabilities, and extensible compilation pipelines for building new programming languages.
+
+### Initial Scope (Core + Lex)
+- **hecate-core**: Foundational diagnostic system with source mapping, span tracking, and beautiful error rendering
+- **hecate-lex**: Declarative lexer generation with integrated error handling
+
+## Technical Requirements
+
+### Core Shard Requirements
+
+#### Source Management
+- Implement SourceFile structure to hold file path, contents, and newline offsets
+- Create SourceMap registry for managing multiple source files
+- Support both file-based and virtual (in-memory) sources
+- Thread-safe source ID generation and access
+
+#### Position and Span Tracking
+- Implement Position type with line/column information (1-based externally, 0-based internally)
+- Create Span type linking source ID with byte offsets
+- Binary search algorithm for efficient span-to-line/column conversion
+- Support for multi-file span references
+
+#### Diagnostic System
+- Flexible Diagnostic structure with severity levels (error, warning, note)
+- Multi-span support with primary and secondary labels
+- Builder API for constructing diagnostics fluently
+- Support for help text and additional notes
+
+#### Rendering System
+- TTY renderer with ANSI color support and theming
+- Rust-style error formatting with code snippets
+- JSON renderer for LSP integration
+- Graceful fallback for NO_COLOR environment
+- Multi-label span visualization with proper alignment
+
+### Lex Shard Requirements
+
+#### Lexer Definition DSL
+- Macro-based DSL for declarative token definitions
+- Support for regex patterns, skip rules, and priorities
+- Compile-time token enum generation
+- Custom error handlers for specific patterns
+
+#### Token Generation
+- Token structure with kind, span, and optional value
+- Lazy lexeme retrieval via source map
+- Efficient span attachment to all tokens
+- EOF token handling
+
+#### Error Handling
+- Integration with Core diagnostic system
+- Common lexical error patterns (unterminated strings, invalid characters)
+- Recovery strategies to continue lexing after errors
+- Contextual error messages with suggestions
+
+#### Implementation Strategy
+- Initial: Regex-based linear scanner using Crystal's built-in regex
+- Future: DFA compilation for performance optimization
+- Longest-match-wins with priority tiebreaking
+
+## Architecture Constraints
+
+### Monorepo Structure
+- Each shard in separate directory under shards/
+- Independent versioning and dependency management
+- Subtree mirroring for individual shard distribution
+
+### Dependency Rules
+- Core has zero dependencies (foundation layer)
+- Lex depends only on Core
+- No circular dependencies allowed
+- Clear module boundaries and namespacing
+
+### Crystal Language Constraints
+- Target Crystal 1.17+
+- Thread-safe design for -Dpreview_mt compatibility
+- Efficient memory usage with struct-based data types
+- Macro-based compile-time code generation
+
+## User Experience Goals
+
+### Developer Experience
+- Intuitive DSL for lexer definition
+- Clear, actionable error messages
+- Minimal boilerplate for common use cases
+- Comprehensive documentation and examples
+
+### Performance Targets
+- 100k+ tokens/second lexing speed (future)
+- Sub-millisecond diagnostic rendering
+- Minimal memory overhead per token
+- Efficient source map operations
+
+### Integration Points
+- Easy integration with future parser shard
+- LSP-ready diagnostic format
+- Extensible rendering system
+- Plugin-friendly architecture
+
+## Testing Requirements
+
+### Core Shard Testing
+- Unit tests for all data structures
+- Snapshot tests for diagnostic rendering
+- Edge case testing (empty files, no newlines)
+- Binary search correctness verification
+- Thread safety validation
+
+### Lex Shard Testing
+- Golden file tests for token sequences
+- Error recovery test scenarios
+- Unicode and multi-byte character handling
+- Performance benchmarking baselines
+- DSL macro expansion verification
+
+## Deliverables
+
+### Core Shard Deliverables
+1. Source management system (SourceFile, SourceMap)
+2. Span and position tracking utilities
+3. Diagnostic builder and data structures
+4. TTY renderer with monochrome support (color in v2)
+5. JSON renderer for tooling integration
+6. Comprehensive test suite
+7. API documentation
+
+### Lex Shard Deliverables
+1. Lexer definition DSL macro
+2. Token and rule data structures
+3. Regex-based scanner implementation
+4. Error handling and recovery
+5. Integration with Core diagnostics
+6. Example lexers and test suite
+7. Performance benchmarking tools
+
+### Documentation
+- README for each shard
+- API reference documentation
+- Integration guide
+- Example language implementation
+
+## Implementation Phases
+
+### Phase 1: Core Foundation (Week 1-2)
+- Implement source management system
+- Create span and position utilities
+- Build diagnostic structures
+- Develop monochrome TTY renderer
+
+### Phase 2: Basic Lexer (Week 2-3)
+- Design and implement DSL macro
+- Create regex-based scanner
+- Integrate with diagnostic system
+- Build initial test suite
+
+### Phase 3: Polish and Testing (Week 3-4)
+- Add color support to TTY renderer
+- Implement JSON renderer
+- Comprehensive testing
+- Documentation and examples
+
+### Phase 4: Performance and Optimization (Post-MVP)
+- String interning system
+- DFA compilation for lexer
+- Incremental lexing support
+- Advanced error recovery
+
+## Success Criteria
+
+### Functional Requirements
+- Successfully lex a sample language with 10+ token types
+- Generate clear diagnostics for common errors
+- Render errors in both TTY and JSON formats
+- Handle multi-file projects cleanly
+
+### Performance Requirements
+- Lex 10k lines in under 100ms
+- Render diagnostics in under 10ms
+- Memory usage under 10MB for typical files
+
+### Quality Requirements
+- 90%+ test coverage
+- Zero memory leaks
+- Thread-safe operation
+- Clean API boundaries
+
+## Future Considerations
+
+### Extensibility
+- Plugin system for custom renderers
+- Incremental computation support
+- Streaming lexer interface
+- Custom diagnostic categories
+
+### Integration
+- Tree-sitter bridge preparation
+- LSP server foundations
+- REPL support groundwork
+- IDE extension compatibility
+
+## Risk Mitigation
+
+### Technical Risks
+- Crystal macro limitations: Extensive testing of macro edge cases
+- Performance bottlenecks: Profiling and benchmarking from day one
+- API stability: Conservative public API exposure
+
+### Design Risks
+- Over-engineering: Focus on MVP features first
+- API churn: Careful design review before exposing APIs
+- Integration complexity: Clear module boundaries
+
+## Non-Goals for Initial Release
+
+- Advanced performance optimizations (DFA, streaming)
+- Full color customization and theming
+- Incremental lexing
+- String interning
+- Markdown renderer
+- Plugin system
+
+## Appendix: Example Usage
+
+### Core Diagnostic Example
+```crystal
+source_map = Hecate::SourceMap.new
+file_id = source_map.add_file("example.hec", "let x = ")
+
+span = Hecate::Span.new(file_id, 8, 9)
+diag = Hecate.error("unexpected end of input")
+  .primary(span, "expected expression here")
+  .help("add a value after '='")
+
+Hecate::TTYRenderer.new.emit(diag, source_map)
+```
+
+### Lex DSL Example
+```crystal
+MyLexer = Hecate::Lex.define do
+  token :WS, /\s+/, skip: true
+  token :Let, /let/
+  token :Ident, /[a-zA-Z_]\w*/
+  token :Equals, /=/
+  token :Int, /\d+/
+  token :String, /"([^"\\]|\\.)*"?/, on_error: :unterminated_string
+  
+  error :unterminated_string, "string literal not terminated", help: "add closing quote"
+end
+
+tokens, diagnostics = MyLexer.lex(file_id, source_map)
+```

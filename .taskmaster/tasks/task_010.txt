@@ -1,0 +1,97 @@
+# Task ID: 10
+# Title: Add JSON Renderer for LSP
+# Status: pending
+# Dependencies: 6, 7
+# Priority: medium
+# Description: Implement JSON diagnostic renderer compatible with Language Server Protocol
+# Details:
+Create src/hecate/core/renderer/json.cr:
+```crystal
+require "json"
+
+module Hecate::Core
+  class JSONRenderer
+    def emit(diagnostic : Diagnostic, source_map : SourceMap) : String
+      JSON.build do |json|
+        json.object do
+          json.field "severity", lsp_severity(diagnostic.severity)
+          json.field "message", diagnostic.message
+          
+          json.field "locations" do
+            json.array do
+              diagnostic.labels.each do |label|
+                if positions = source_map.span_to_position(label.span)
+                  start_pos, end_pos = positions
+                  source = source_map.get(label.span.source_id)
+                  
+                  json.object do
+                    json.field "file", source.try(&.path) || "<unknown>"
+                    json.field "range" do
+                      json.object do
+                        json.field "start", position_to_lsp(start_pos)
+                        json.field "end", position_to_lsp(end_pos)
+                      end
+                    end
+                    json.field "message", label.message
+                  end
+                end
+              end
+            end
+          end
+          
+          json.field "relatedInformation" do
+            json.array do
+              diagnostic.notes.each do |note|
+                json.object { json.field "message", note }
+              end
+            end
+          end
+        end
+      end
+    end
+    
+    private def lsp_severity(severity : Severity) : Int32
+      case severity
+      when .error? then 1
+      when .warning? then 2
+      when .note? then 3
+      end
+    end
+  end
+end
+```
+
+# Test Strategy:
+Validate JSON output against LSP schema, test round-trip serialization, verify all fields are properly escaped
+
+# Subtasks:
+## 1. Define LSP Diagnostic Structure [pending]
+### Dependencies: None
+### Description: Create data structures that match LSP diagnostic specification including severity levels, ranges, and related information
+### Details:
+Define Crystal structs/classes that map to LSP diagnostic format: DiagnosticSeverity enum (Error=1, Warning=2, Information=3, Hint=4), Range with start/end positions, Location with URI and range, Diagnostic with severity/range/message/code/source fields, and DiagnosticRelatedInformation for additional context. Ensure all fields follow LSP 3.17 specification exactly.
+
+## 2. Implement Position Conversion [pending]
+### Dependencies: 10.1
+### Description: Create helper methods to convert Hecate's span positions to LSP-compatible line/character positions
+### Details:
+Implement position_to_lsp method that converts Hecate::Core::Position (line, column) to LSP Position format {line: 0-based, character: 0-based UTF-16 code unit offset}. Handle edge cases like empty files, positions beyond file end, and multi-byte UTF-8 characters that need proper UTF-16 conversion. Add methods for range conversion that handles start/end positions.
+
+## 3. Build Core JSON Rendering Logic [pending]
+### Dependencies: 10.1, 10.2
+### Description: Implement the main emit method that transforms Hecate diagnostics into LSP-compliant JSON output
+### Details:
+Complete the JSONRenderer.emit method to handle all diagnostic fields: convert severity using lsp_severity, map primary label to main diagnostic range, convert secondary labels to relatedInformation with proper file URIs, handle missing source information gracefully, ensure all strings are properly escaped for JSON. Add support for diagnostic codes and source fields if present.
+
+## 4. Add Batch Rendering Support [pending]
+### Dependencies: 10.3
+### Description: Extend JSONRenderer to emit arrays of diagnostics for batch processing as required by LSP
+### Details:
+Add emit_batch method that accepts Array(Diagnostic) and produces a JSON array of LSP diagnostics. Implement efficient streaming to handle large diagnostic sets without excessive memory usage. Add options for pretty-printing vs compact output. Support filtering by severity or source file to match LSP's per-document diagnostic model.
+
+## 5. Create Integration Tests [pending]
+### Dependencies: 10.3, 10.4
+### Description: Build comprehensive test suite that validates JSON output against real LSP clients and the official LSP specification
+### Details:
+Create integration tests that: parse example Crystal/language files to generate real diagnostics, render them to JSON, validate output against LSP JSON schema, test round-trip serialization/deserialization, verify compatibility with common LSP client libraries. Include performance tests to ensure rendering stays under 1ms for typical diagnostic sets.
+

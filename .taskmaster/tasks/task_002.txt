@@ -1,0 +1,50 @@
+# Task ID: 2
+# Title: Setup Core Shard Foundation
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Initialize the hecate-core shard with proper Crystal project structure and zero dependencies
+# Details:
+In shards/hecate-core/:
+- Create shard.yml with name: hecate-core, version: 0.1.0, crystal: >=1.17.0
+- Set up src/hecate-core.cr as main entry point
+- Create src/hecate/core.cr with module Hecate::Core and VERSION constant
+- Set up spec/spec_helper.cr with require "spec"
+- Create LICENSE (MIT) and README.md
+- Add Makefile with test, build, and docs targets
+- Configure crystal docs generation
+
+# Test Strategy:
+Run 'shards install' successfully, verify 'crystal spec' runs (even with no tests), ensure 'crystal build src/hecate-core.cr' compiles
+
+# Subtasks:
+## 1. Create Directory Structure [pending]
+### Dependencies: None
+### Description: Create the basic directory structure for hecate-core shard including src, spec, and documentation directories
+### Details:
+Create shards/hecate-core/ directory if it doesn't exist. Inside, create: src/, src/hecate/, spec/ directories. This establishes the standard Crystal shard layout required for all subsequent files.
+
+## 2. Initialize shard.yml Configuration [pending]
+### Dependencies: 2.1
+### Description: Create and configure the shard.yml file with proper metadata and Crystal version requirements
+### Details:
+Create shards/hecate-core/shard.yml with: name: hecate-core, version: 0.1.0, crystal: '>=1.17.0', license: MIT, authors: [appropriate author info]. Ensure no dependencies are specified as this is the core shard.
+
+## 3. Setup Module Structure and Entry Points [pending]
+### Dependencies: 2.1
+### Description: Create the main module files with proper namespace hierarchy and version constant
+### Details:
+Create src/hecate-core.cr with require './hecate/core'. Create src/hecate/core.cr with module Hecate::Core definition and VERSION = '0.1.0' constant. This establishes the namespace structure for all core functionality.
+
+## 4. Configure Testing Infrastructure [pending]
+### Dependencies: 2.1
+### Description: Set up the spec helper and basic test structure for the core shard
+### Details:
+Create spec/spec_helper.cr with 'require "spec"' and 'require "../src/hecate-core"'. Create a basic spec file spec/hecate/core_spec.cr to verify the module loads correctly and VERSION constant is accessible.
+
+## 5. Create Documentation and Build Configuration [pending]
+### Dependencies: 2.1, 2.2, 2.3
+### Description: Set up README, LICENSE, and Makefile for documentation and common development tasks
+### Details:
+Create LICENSE file with MIT license text. Create README.md with shard description, installation instructions, and basic usage. Create Makefile with targets: test (crystal spec), build (crystal build src/hecate-core.cr), docs (crystal docs), and clean. Configure .gitignore if needed.
+

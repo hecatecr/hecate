@@ -1,0 +1,66 @@
+# Task ID: 3
+# Title: Implement SourceFile Structure
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Create the SourceFile class to hold file metadata, contents, and line offset tracking for efficient position calculations
+# Details:
+Create src/hecate/core/source_file.cr:
+```crystal
+module Hecate::Core
+  struct SourceFile
+    getter id : UInt32
+    getter path : String
+    getter contents : String
+    getter line_offsets : Array(Int32)
+    
+    def initialize(@id, @path, @contents)
+      @line_offsets = compute_line_offsets(@contents)
+    end
+    
+    private def compute_line_offsets(text)
+      offsets = [0]
+      text.each_char_with_index do |char, idx|
+        offsets << idx + 1 if char == '\n'
+      end
+      offsets
+    end
+  end
+end
+```
+Implement methods for byte_to_position using binary search, position_to_byte conversion, and line extraction. Handle edge cases: empty files, no trailing newline, CRLF vs LF.
+
+# Test Strategy:
+Test with various file contents: empty, single line, multiple lines, no trailing newline, CRLF line endings. Verify line offset calculation accuracy and position conversion correctness.
+
+# Subtasks:
+## 1. Core SourceFile Structure Implementation [pending]
+### Dependencies: None
+### Description: Implement the basic SourceFile struct with id, path, contents fields and line offset computation logic
+### Details:
+Create the SourceFile struct in src/hecate/core/source_file.cr with getter methods for id, path, contents, and line_offsets. Implement the initialize method that computes line offsets during construction. The compute_line_offsets method should iterate through the text and record the byte offset after each newline character, starting with 0 for the beginning of the file.
+
+## 2. Binary Search Position Conversion [pending]
+### Dependencies: 3.1
+### Description: Implement byte_to_position method using efficient binary search on line_offsets array
+### Details:
+Add byte_to_position(byte_offset: Int32) : Position method that uses binary search on the line_offsets array to find the line containing the given byte offset. Calculate the column by subtracting the line start offset from the byte offset. Return a Position struct with zero-based line and column values. Handle edge cases like negative offsets or offsets beyond file length.
+
+## 3. Reverse Position Conversion [pending]
+### Dependencies: 3.1
+### Description: Implement position_to_byte method to convert line/column back to byte offset
+### Details:
+Add position_to_byte(position: Position) : Int32? method that validates the line number is within bounds, then calculates the byte offset by adding the line start offset from line_offsets[position.line] to the column value. Return nil if the position is invalid (line out of bounds or column exceeds line length). Ensure proper bounds checking to prevent array access errors.
+
+## 4. Line Extraction Methods [pending]
+### Dependencies: 3.1, 3.2
+### Description: Implement methods to extract specific lines and line ranges from the source file
+### Details:
+Add line_at(line_number: Int32) : String? method that returns the text of a specific line (without the trailing newline). Add line_range(start_line: Int32, end_line: Int32) : Array(String) for extracting multiple consecutive lines. Use the line_offsets array to efficiently locate line boundaries without scanning the entire file. Handle edge cases like requesting lines beyond file bounds.
+
+## 5. Line Ending Normalization [pending]
+### Dependencies: 3.1, 3.2, 3.3
+### Description: Handle mixed line endings (CRLF vs LF) in compute_line_offsets and position calculations
+### Details:
+Enhance compute_line_offsets to properly handle both LF (\n) and CRLF (\r\n) line endings. When encountering \r\n, record the offset after both characters as a single line ending. Update byte_to_position to correctly calculate columns when CRLF is present. Consider adding a line_ending_style property to track whether the file uses LF, CRLF, or mixed endings for diagnostic purposes.
+

@@ -1,0 +1,82 @@
+# Task ID: 18
+# Title: Implement Performance Benchmarks
+# Status: pending
+# Dependencies: 15, 16
+# Priority: medium
+# Description: Create benchmarking suite to validate performance targets and establish baselines
+# Details:
+Create tools/bench/:
+```crystal
+# tools/bench/lexer_bench.cr
+require "benchmark"
+require "../../shards/hecate-lex/src/hecate-lex"
+
+# Generate test files of various sizes
+def generate_source(lines : Int32) : String
+  String.build do |io|
+    lines.times do |i|
+      io.puts "let var#{i} = #{i} + #{i * 2}; // comment #{i}"
+    end
+  end
+end
+
+SampleLexer = Hecate::Lex.define do
+  token :WS, /\s+/, skip: true
+  token :Comment, %r{//.*}, skip: true
+  token :Let, /let/
+  token :Ident, /[a-zA-Z_]\w*/
+  token :Int, /\d+/
+  token :Plus, /\+/
+  token :Equals, /=/
+  token :Semi, /;/
+end
+
+Benchmark.ips do |x|
+  [100, 1000, 10000].each do |lines|
+    source = generate_source(lines)
+    source_map = Hecate::Core::SourceMap.new
+    file_id = source_map.add_virtual("bench", source)
+    
+    x.report("#{lines} lines") do
+      SampleLexer.new.lex(file_id, source_map)
+    end
+  end
+end
+```
+
+Create memory profiling tools and continuous benchmark tracking.
+
+# Test Strategy:
+Verify 100k+ tokens/second on modern hardware, ensure linear scaling with input size, check memory usage stays under 10MB for typical files
+
+# Subtasks:
+## 1. Create Basic Benchmarking Infrastructure [pending]
+### Dependencies: None
+### Description: Set up the foundational benchmarking framework and directory structure for performance testing
+### Details:
+Create tools/bench/ directory structure with base benchmark utilities. Implement a base benchmark runner that provides common functionality like warmup runs, statistical analysis (mean, median, p95, p99), and result formatting. Create benchmark_helper.cr with utilities for generating test data, measuring memory usage, and formatting results in both human-readable and machine-parseable formats (JSON/CSV).
+
+## 2. Implement Lexer Performance Benchmarks [pending]
+### Dependencies: 18.1
+### Description: Create comprehensive lexer benchmarks testing various input sizes and token patterns
+### Details:
+Implement tools/bench/lexer_bench.cr with the provided sample code. Add additional benchmarks for edge cases: deeply nested comments, long identifiers, large integer literals, pathological regex patterns. Create benchmarks for different language styles (keyword-heavy vs identifier-heavy). Measure both throughput (tokens/second) and latency (time to first token). Include benchmarks for error recovery scenarios with malformed input.
+
+## 3. Create Memory Profiling Tools [pending]
+### Dependencies: 18.1
+### Description: Develop tools to measure and track memory usage during compilation phases
+### Details:
+Create tools/bench/memory_profiler.cr using Crystal's GC stats and system memory APIs. Implement heap snapshot capabilities to identify memory hotspots. Create memory benchmarks for each compilation phase (lexing, parsing, semantic analysis). Add tools to detect memory leaks by running operations repeatedly and checking for monotonic growth. Implement memory usage visualization that can output graphs showing memory usage over time during compilation.
+
+## 4. Implement Continuous Benchmark Tracking [pending]
+### Dependencies: 18.2, 18.3
+### Description: Create system for tracking benchmark results over time and detecting performance regressions
+### Details:
+Create tools/bench/tracker.cr to store benchmark results in JSON format with git commit hash, timestamp, and system info. Implement regression detection that compares current results against historical baselines and flags degradations >10%. Create benchmark CI integration that runs on every commit and comments on PRs with performance impact. Add visualization tools to generate performance trend graphs. Store results in .taskmaster/bench-results/ with rotation to prevent unbounded growth.
+
+## 5. Add Parser and Semantic Analysis Benchmarks [pending]
+### Dependencies: 18.2
+### Description: Extend benchmarking suite to cover parser combinators and semantic analysis phases
+### Details:
+Create tools/bench/parser_bench.cr to measure parser performance with various grammar complexities. Add benchmarks for expression parsing with different precedence levels, recursive descent performance, and error recovery speed. Create tools/bench/semantic_bench.cr for type checking, symbol resolution, and scope analysis performance. Include benchmarks for incremental parsing/analysis scenarios. Measure performance of diagnostic generation and source mapping operations.
+

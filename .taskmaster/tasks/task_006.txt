@@ -1,0 +1,77 @@
+# Task ID: 6
+# Title: Design Diagnostic Data Structure
+# Status: pending
+# Dependencies: 4, 5
+# Priority: high
+# Description: Create flexible Diagnostic structure supporting severity levels, multi-span labels, and additional metadata
+# Details:
+Create src/hecate/core/diagnostic.cr:
+```crystal
+module Hecate::Core
+  enum Severity
+    Error
+    Warning
+    Note
+  end
+  
+  struct Label
+    getter span : Span
+    getter message : String
+    getter style : LabelStyle
+    
+    enum LabelStyle
+      Primary
+      Secondary
+    end
+  end
+  
+  class Diagnostic
+    getter severity : Severity
+    getter message : String
+    getter labels : Array(Label)
+    getter help : String?
+    getter notes : Array(String)
+    
+    def initialize(@severity, @message)
+      @labels = [] of Label
+      @notes = [] of String
+    end
+  end
+end
+```
+Include methods for adding labels, setting help text, and builder pattern support.
+
+# Test Strategy:
+Create diagnostics with various configurations, verify immutability of core fields, test label ordering and deduplication
+
+# Subtasks:
+## 1. Create Basic Diagnostic Structure [pending]
+### Dependencies: None
+### Description: Implement the core Diagnostic class with severity, message, and label storage
+### Details:
+Create the base Diagnostic class in src/hecate/core/diagnostic.cr with: Severity enum (Error, Warning, Note), Label struct with span/message/style, basic Diagnostic class with severity, message, labels array, help text, and notes array. Ensure proper initialization and basic getter methods.
+
+## 2. Implement Label Management Methods [pending]
+### Dependencies: 6.1
+### Description: Add methods for adding, sorting, and managing diagnostic labels
+### Details:
+Add methods to Diagnostic class: add_label(span, message, style) for adding labels, primary_label and secondary_label convenience methods, label sorting by span position, label deduplication logic to prevent duplicate spans, and methods to query labels by style type.
+
+## 3. Create Diagnostic Builder Pattern [pending]
+### Dependencies: 6.1, 6.2
+### Description: Implement fluent builder API for constructing diagnostics with method chaining
+### Details:
+Create DiagnosticBuilder class that wraps a Diagnostic instance. Implement fluent methods: primary(span, message), secondary(span, message), help(text), note(text), with_code(code), with_url(url). Each method should return self for chaining. Add build() method that returns the configured Diagnostic.
+
+## 4. Add Diagnostic Factory Methods [pending]
+### Dependencies: 6.1, 6.3
+### Description: Create convenient factory methods for common diagnostic patterns
+### Details:
+Add static factory methods to Diagnostic class: error(message), warning(message), note(message) that return DiagnosticBuilder instances. Add span_error(span, message) and similar methods that automatically add a primary label. Include with_context methods that clone existing diagnostics with additional labels.
+
+## 5. Implement Diagnostic Metadata Support [pending]
+### Dependencies: 6.1, 6.2, 6.3
+### Description: Add support for additional metadata like error codes, URLs, and suggestions
+### Details:
+Extend Diagnostic class with metadata fields: error_code (String?), url (String?), suggestions (Array(String)), machine_applicable (Bool for automated fixes). Add corresponding builder methods. Implement to_json serialization for LSP integration. Add equality comparison and hash methods for testing.
+

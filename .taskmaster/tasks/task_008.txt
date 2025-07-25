@@ -1,0 +1,80 @@
+# Task ID: 8
+# Title: Create TTY Renderer Foundation
+# Status: pending
+# Dependencies: 5, 6, 7
+# Priority: high
+# Description: Build monochrome TTY renderer for diagnostic output with proper formatting and alignment
+# Details:
+Create src/hecate/core/renderer/tty.cr:
+```crystal
+module Hecate::Core
+  class TTYRenderer
+    def initialize(@output : IO = STDOUT, @width : Int32 = 80)
+      @no_color = ENV["NO_COLOR"]? != nil
+    end
+    
+    def emit(diagnostic : Diagnostic, source_map : SourceMap)
+      emit_header(diagnostic)
+      
+      # Group labels by source file
+      labels_by_source = diagnostic.labels.group_by(&.span.source_id)
+      
+      labels_by_source.each do |source_id, labels|
+        source = source_map.get(source_id)
+        next unless source
+        
+        emit_source_section(source, labels, source_map)
+      end
+      
+      emit_help(diagnostic.help) if diagnostic.help
+      diagnostic.notes.each { |note| emit_note(note) }
+    end
+    
+    private def emit_header(diagnostic)
+      severity_text = case diagnostic.severity
+      when .error? then "error"
+      when .warning? then "warning"
+      when .note? then "note"
+      end
+      
+      @output.puts "#{severity_text}: #{diagnostic.message}"
+    end
+  end
+end
+```
+Implement line number formatting, source line extraction, and label underlining with proper Unicode handling.
+
+# Test Strategy:
+Snapshot test output against expected formatting, test with various terminal widths, verify NO_COLOR environment variable handling
+
+# Subtasks:
+## 1. Implement emit_source_section method [pending]
+### Dependencies: None
+### Description: Create the core method that renders a source code section with line numbers, source lines, and label annotations
+### Details:
+Implement emit_source_section(source: SourceFile, labels: Array(Label), source_map: SourceMap) method. Extract the relevant source lines based on label spans, calculate the line number gutter width, and render each line with its line number. Handle multi-line spans appropriately by showing all covered lines.
+
+## 2. Create line extraction and formatting logic [pending]
+### Dependencies: 8.1
+### Description: Build methods to extract source lines and format them with proper line numbers and padding
+### Details:
+Add private methods: extract_lines(source: SourceFile, start_line: Int32, end_line: Int32) to get the relevant source lines, and format_line_number(line_num: Int32, width: Int32) to right-align line numbers with proper padding. Include pipe separator after line numbers.
+
+## 3. Implement label underlining with Unicode support [pending]
+### Dependencies: 8.2
+### Description: Create the underlining system that shows carets and underlines beneath source lines to highlight label spans
+### Details:
+Implement emit_label_underlines(line: String, labels: Array(Label), line_offset: Int32) method. Calculate proper column positions accounting for Unicode characters and tabs. Use '^' for primary labels and '~' for secondary labels. Handle overlapping labels and multi-byte characters correctly.
+
+## 4. Add help and note rendering methods [pending]
+### Dependencies: 8.3
+### Description: Implement methods to render help text and notes with proper formatting and indentation
+### Details:
+Create emit_help(help: String?) and emit_note(note: String) private methods. Format help text with 'help: ' prefix and notes with 'note: ' prefix. Ensure proper indentation and line wrapping within the terminal width constraint.
+
+## 5. Handle NO_COLOR environment and create integration tests [pending]
+### Dependencies: 8.4
+### Description: Ensure NO_COLOR environment variable is respected and create comprehensive integration tests for the complete renderer
+### Details:
+Although this is a monochrome renderer, ensure the NO_COLOR pattern is established for future color support. Create integration tests that render complete diagnostics with multiple labels, different severities, and various source file scenarios. Test the full rendering pipeline.
+

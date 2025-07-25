@@ -1,0 +1,173 @@
+{
+	"meta": {
+		"generatedAt": "2025-07-24T15:27:36.836Z",
+		"tasksAnalyzed": 20,
+		"totalTasks": 20,
+		"analysisCount": 20,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": true
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 1,
+			"taskTitle": "Initialize Monorepo Structure",
+			"complexityScore": 4,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down the monorepo initialization into subtasks for directory creation, git setup, CI/CD configuration, dependency management setup, documentation files, and validation steps. Each subtask should be independently executable.",
+			"reasoning": "While conceptually straightforward, this task involves multiple independent setup steps across different tools (git, GitHub Actions, Crystal workspace). Each component requires specific configuration and validation."
+		},
+		{
+			"taskId": 2,
+			"taskTitle": "Setup Core Shard Foundation",
+			"complexityScore": 3,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Divide into subtasks for shard.yml creation, source file structure setup, spec infrastructure, documentation creation, and build configuration. Focus on establishing the foundation that other shards will follow.",
+			"reasoning": "This is a standard Crystal shard setup but requires careful attention to structure since it's the foundation for all other shards. The zero-dependency requirement and module structure need proper implementation."
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "Implement SourceFile Structure",
+			"complexityScore": 6,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Break down into: basic struct definition, line offset computation algorithm, byte-to-position conversion with binary search, position-to-byte conversion, line extraction methods, edge case handling (CRLF, empty files), and comprehensive unit tests.",
+			"reasoning": "The core complexity lies in efficient position calculations and handling various text formats. Binary search implementation and edge case handling require careful implementation and thorough testing."
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "Create Position and Span Types",
+			"complexityScore": 3,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Split into: Position struct with display conversion, Span struct with validation, comparison operators for both types, and unit tests covering all edge cases.",
+			"reasoning": "These are fundamental data structures but relatively simple. The main considerations are 0-based vs 1-based indexing and span validation logic."
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "Build SourceMap Registry",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Decompose into: basic SourceMap class structure, thread-safe file addition, ID generation system, path deduplication, virtual file support, span-to-position conversion implementation, retrieval methods, and concurrent access testing.",
+			"reasoning": "Thread safety with Crystal's Mutex, efficient lookups, and proper span-to-position conversion across multiple files add significant complexity. The concurrent access patterns need careful testing."
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "Design Diagnostic Data Structure",
+			"complexityScore": 4,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break into: Severity enum definition, Label struct with style enum, core Diagnostic class, builder pattern groundwork, and unit tests for all components.",
+			"reasoning": "The data structures themselves are straightforward, but the design needs to support the builder pattern and handle multiple labels elegantly. The immutability constraints add some complexity."
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "Implement Diagnostic Builder API",
+			"complexityScore": 4,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Split into: DiagnosticBuilder class implementation, fluent API methods (primary, secondary, help, note), module-level helper functions, method chaining validation, and comprehensive API tests.",
+			"reasoning": "The builder pattern is well-understood but requires careful implementation for proper method chaining. The module-level helpers need to integrate smoothly with the builder."
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "Create TTY Renderer Foundation",
+			"complexityScore": 8,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Divide into: basic renderer class structure, header formatting, source grouping logic, line number formatting, source line extraction, basic output methods, NO_COLOR handling, width-aware formatting, and snapshot testing setup.",
+			"reasoning": "TTY rendering involves complex formatting logic, proper spacing and alignment, handling of terminal capabilities, and setting up the foundation for the more complex snippet rendering. The snapshot testing infrastructure is also non-trivial."
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "Implement Source Code Snippet Rendering",
+			"complexityScore": 9,
+			"recommendedSubtasks": 10,
+			"expansionPrompt": "Break down into: context line calculation algorithm, label sorting and filtering, line-by-line rendering, underline position calculation, overlapping label handling, Unicode width calculation, multi-line span support, annotation message formatting, proper spacing logic, and comprehensive visual tests.",
+			"reasoning": "This is one of the most complex tasks, requiring algorithms for overlapping labels, Unicode handling, proper visual alignment, and complex spacing calculations. The visual nature makes testing challenging."
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "Add JSON Renderer for LSP",
+			"complexityScore": 5,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Split into: basic JSON structure, LSP severity mapping, location transformation logic, related information handling, proper escaping implementation, and LSP schema validation tests.",
+			"reasoning": "While JSON generation is straightforward, proper LSP compliance requires attention to the schema details and coordinate system conversions. Testing against LSP schema adds complexity."
+		},
+		{
+			"taskId": 11,
+			"taskTitle": "Setup Lex Shard Foundation",
+			"complexityScore": 2,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Divide into: shard.yml with core dependency, source file structure, spec setup, and basic compilation test.",
+			"reasoning": "This is mostly boilerplate following the same pattern as hecate-core but with the added dependency configuration. Very straightforward."
+		},
+		{
+			"taskId": 12,
+			"taskTitle": "Design Token Data Structure",
+			"complexityScore": 4,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break into: generic Token struct definition, lazy lexeme retrieval implementation, equality operators, builder/factory methods, and comprehensive unit tests.",
+			"reasoning": "The generic design and lazy lexeme retrieval add some complexity, but the overall structure is straightforward. The interaction with SourceMap needs careful implementation."
+		},
+		{
+			"taskId": 13,
+			"taskTitle": "Implement Lexer Rule Types",
+			"complexityScore": 6,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Decompose into: Rule struct with all fields, regex compilation and caching, anchored matching implementation, RuleSet class, priority-based sorting, error handler integration, and performance tests.",
+			"reasoning": "Regex handling, efficient matching at positions, and priority-based rule management add complexity. The performance implications of regex compilation need careful consideration."
+		},
+		{
+			"taskId": 14,
+			"taskTitle": "Build Lexer Definition DSL",
+			"complexityScore": 9,
+			"recommendedSubtasks": 10,
+			"expansionPrompt": "Break down into: macro structure design, token enum generation, DSL method implementations, rule registration logic, error handler registration, lexer class generation, macro hygiene handling, compile-time validation, integration with scanner, and extensive macro testing.",
+			"reasoning": "Crystal macro programming is complex, especially for DSL creation. Compile-time code generation, proper macro hygiene, and error handling at compile-time make this one of the most challenging tasks."
+		},
+		{
+			"taskId": 15,
+			"taskTitle": "Implement Scanner Algorithm",
+			"complexityScore": 8,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Divide into: Scanner class structure, main scanning loop, longest-match algorithm implementation, priority handling within same-length matches, token creation logic, error recovery mechanism, EOF handling, diagnostic integration, and performance optimization.",
+			"reasoning": "The core scanning algorithm with longest-match-wins, priority handling, and error recovery is algorithmically complex. Performance considerations and proper error handling add significant complexity."
+		},
+		{
+			"taskId": 16,
+			"taskTitle": "Add Common Error Handlers",
+			"complexityScore": 5,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Split into: ErrorHandler struct, common error definitions, scanner integration hooks, error pattern detection, diagnostic generation from handlers, and comprehensive error case testing.",
+			"reasoning": "While the error handler structure is simple, integrating it properly with the scanner and ensuring good diagnostic messages for various error patterns requires careful design."
+		},
+		{
+			"taskId": 17,
+			"taskTitle": "Create Comprehensive Test Suite",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Break into: snapshot testing infrastructure, test helper modules, core shard test coverage, lex shard test coverage, integration test framework, sample language tests, coverage reporting setup, and CI integration.",
+			"reasoning": "Setting up a comprehensive testing framework with snapshot testing, achieving high coverage across multiple shards, and creating meaningful integration tests is a substantial undertaking."
+		},
+		{
+			"taskId": 18,
+			"taskTitle": "Implement Performance Benchmarks",
+			"complexityScore": 6,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Divide into: benchmark framework setup, test data generation, lexer benchmarks, memory profiling setup, performance regression detection, continuous benchmark tracking, and reporting infrastructure.",
+			"reasoning": "Creating meaningful benchmarks, setting up profiling tools, and establishing performance baselines requires careful design. The continuous tracking aspect adds infrastructure complexity."
+		},
+		{
+			"taskId": 19,
+			"taskTitle": "Write Documentation and Examples",
+			"complexityScore": 5,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Split into: main project documentation, core shard API docs, lex shard API docs, example implementations, crystal doc generation setup, and documentation testing framework.",
+			"reasoning": "Comprehensive documentation across multiple shards with working examples requires significant effort. Ensuring examples stay in sync with the code adds complexity."
+		},
+		{
+			"taskId": 20,
+			"taskTitle": "Setup Release Automation",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Break down into: release script core logic, version update automation, subtree mirroring setup, tag creation logic, GitHub Actions workflow, dry-run mode implementation, rollback procedures, and integration testing.",
+			"reasoning": "Automated releases with subtree mirroring, coordinated version updates, and proper error handling require careful scripting. The GitHub Actions integration and testing of the release process add complexity."
+		}
+	]
+}

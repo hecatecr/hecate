@@ -1,0 +1,30 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    
+  # Monitor root shard.yml
+  - package-ecosystem: "bundler"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-type: "all"
+    
+  # Monitor hecate-core
+  - package-ecosystem: "bundler"
+    directory: "/shards/hecate-core"
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-type: "all"
+    
+  # Monitor hecate-lex
+  - package-ecosystem: "bundler"
+    directory: "/shards/hecate-lex"
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-type: "all"

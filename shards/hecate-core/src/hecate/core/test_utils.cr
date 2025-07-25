@@ -170,8 +170,36 @@ module Hecate::Core
       # Get the golden file path
       private def self.golden_path_for(name : String) : String
         # Golden files are stored in spec/fixtures/golden
-        project_root = find_project_root
-        File.join(project_root, "spec", "fixtures", GOLDEN_DIR, name)
+        # When running from monorepo root, we need to find the actual shard directory
+        spec_dir = find_spec_directory
+        File.join(spec_dir, "fixtures", GOLDEN_DIR, name)
+      end
+
+      # Find the spec directory by looking up from the current test file
+      private def self.find_spec_directory : String
+        # Get the calling spec file location from the call stack
+        caller_location = caller.find { |loc| loc.includes?("_spec.cr") }
+        if caller_location.nil?
+          raise "Could not determine spec file location"
+        end
+        
+        # Extract the file path from the caller location
+        # Format is like "path/to/file.cr:123:4 in 'method'"
+        spec_file = caller_location.split(':').first
+        spec_file_dir = File.dirname(spec_file)
+        
+        # Walk up to find the spec directory
+        current = spec_file_dir
+        loop do
+          if File.basename(current) == "spec"
+            return current
+          end
+          parent = File.dirname(current)
+          break if parent == current
+          current = parent
+        end
+        
+        raise "Could not find spec directory"
       end
 
       # Find project root by looking for shard.yml

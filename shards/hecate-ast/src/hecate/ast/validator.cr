@@ -57,9 +57,9 @@ module Hecate::AST
       @errors.clear
     end
 
-    # Check if any errors were found
+    # Check if any errors were found (warnings, hints, and info don't affect validity)
     def valid? : Bool
-      @errors.empty?
+      errors_only.empty?
     end
 
     # Get errors by severity level

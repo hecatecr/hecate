@@ -632,7 +632,7 @@
         "dependencies": [
           7
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -673,7 +673,7 @@
               "10.3"
             ],
             "details": "Extend ASTValidator with built-in structural checks: detect nodes without proper parent references, identify circular dependencies in the AST, validate that child nodes match expected types based on field definitions, and check for required fields that are nil. These checks should run alongside custom validation rules and generate appropriate diagnostics with clear error messages and accurate spans.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Create ASTs with various structural issues (cycles, orphans, type mismatches), verify each issue generates appropriate diagnostics, test that structural validation doesn't interfere with custom rules"
           },
           {
@@ -684,7 +684,7 @@
               "10.4"
             ],
             "details": "Write spec files covering: DSL syntax variations, validation rule complexity (simple field checks to complex multi-field validations), diagnostic generation with accurate spans, structural validation edge cases, performance tests with large ASTs (10k+ nodes), and integration with existing visitor pattern. Create example validations for common patterns like type checking, range validation, and reference validation. Document the validation API with Crystal doc comments.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Use snapshot testing for diagnostic output, benchmark validation overhead on various AST sizes, test error cases and edge conditions, verify validation integrates smoothly with other AST operations"
           }
         ]
@@ -828,7 +828,7 @@
     ],
     "metadata": {
       "created": "2025-07-12T21:43:14.427Z",
-      "updated": "2025-07-26T04:59:32.836Z",
+      "updated": "2025-07-26T05:12:00.955Z",
       "description": "Tasks for master context"
     }
   }

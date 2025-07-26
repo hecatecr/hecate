@@ -6,25 +6,25 @@ require "../src/hecate-ast"
 # Define a simple expression language AST
 module SimpleExpr
   include Hecate::AST
-  
+
   # Abstract base type
   abstract_node Expr
-  
+
   # Simple expression nodes
   node IntLit < Expr, value : Int32
   node Identifier < Expr, name : String
   node BinaryOp < Expr, operator : String, left : Expr, right : Expr
   node UnaryOp < Expr, operator : String, operand : Expr
-  
+
   # Finalize the AST
   finalize_ast IntLit, Identifier, BinaryOp, UnaryOp
-  
+
   # Generate builder methods
   generate_builder IntLit, value : Int32
   generate_builder Identifier, name : String
   generate_builder BinaryOp, operator : String, left : Expr, right : Expr
   generate_builder UnaryOp, operator : String, operand : Expr
-  
+
   # Add convenience methods
   add_builder_conveniences
 end
@@ -56,7 +56,7 @@ manual_expr = SimpleExpr::BinaryOp.new(
 
 # Builder construction (ergonomic)
 builder_expr = SimpleExpr::Builder.build do
-  binary_op("*", 
+  binary_op("*",
     binary_op("+", int_lit(1), int_lit(2)),
     int_lit(3))
 end
@@ -85,7 +85,7 @@ puts "Example 3: Complex expression: a + b * c - d"
 
 complex_expr = SimpleExpr::Builder.build do
   binary_op("-",
-    binary_op("+", 
+    binary_op("+",
       identifier("a"),
       binary_op("*", identifier("b"), identifier("c"))
     ),
@@ -102,8 +102,8 @@ puts
 puts "Example 4: Span propagation with span_for helper"
 
 # Create nodes with specific spans to demonstrate span calculation
-left_node = SimpleExpr::Builder.int_lit(10, span(0, 2))    # "10" at position 0-2
-right_node = SimpleExpr::Builder.int_lit(20, span(5, 7))   # "20" at position 5-7
+left_node = SimpleExpr::Builder.int_lit(10, span(0, 2))  # "10" at position 0-2
+right_node = SimpleExpr::Builder.int_lit(20, span(5, 7)) # "20" at position 5-7
 
 # Calculate encompassing span
 encompassing_span = SimpleExpr::Builder.span_for(left_node, right_node)
@@ -129,7 +129,7 @@ puts "Nil expression: #{nil_expr.inspect}"
 # Using list for arrays of expressions
 expr_list = SimpleExpr::Builder.list(
   SimpleExpr::Builder.int_lit(1),
-  SimpleExpr::Builder.int_lit(2), 
+  SimpleExpr::Builder.int_lit(2),
   SimpleExpr::Builder.identifier("x")
 )
 puts "Expression list: #{expr_list.map(&.class.name)}"
@@ -141,8 +141,8 @@ puts "=== Integration Test: Building a Complex Expression Tree ==="
 # Represents: -(a + (b * 2)) - (x + y)
 complex_tree = SimpleExpr::Builder.build do
   binary_op("-",
-    unary_op("-", 
-      binary_op("+", 
+    unary_op("-",
+      binary_op("+",
         identifier("a"),
         binary_op("*", identifier("b"), int_lit(2))
       )
@@ -161,7 +161,7 @@ def show_structure(node, indent = 0)
   case node
   when SimpleExpr::IntLit
     puts "#{prefix}IntLit(#{node.value})"
-  when SimpleExpr::Identifier  
+  when SimpleExpr::Identifier
     puts "#{prefix}Identifier(#{node.name})"
   when SimpleExpr::BinaryOp
     puts "#{prefix}BinaryOp(#{node.operator})"
@@ -179,7 +179,7 @@ show_structure(complex_tree)
 puts
 puts "=== Builder Pattern Benefits ==="
 puts "✅ Automatic span handling with DEFAULT_SPAN"
-puts "✅ Clean, readable DSL syntax with build blocks" 
+puts "✅ Clean, readable DSL syntax with build blocks"
 puts "✅ Type-safe construction with Crystal's type system"
 puts "✅ Span propagation helpers for accurate source mapping"
 puts "✅ Convenience methods for optional values and lists"

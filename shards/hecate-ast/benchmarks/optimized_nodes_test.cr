@@ -14,7 +14,7 @@ module OptimizedNodeTest
   optimized_node BoolLit < Expr, value : Bool
   optimized_node Identifier < Expr, name : String
 
-  # Regular class-based nodes for comparison  
+  # Regular class-based nodes for comparison
   node RegularIntLit < Expr, value : Int32
   node RegularStringLit < Expr, value : String
 
@@ -103,7 +103,7 @@ GC.collect
 sleep 0.01.seconds
 
 # Test regular node memory
-before_reg = GC.stats  
+before_reg = GC.stats
 reg_nodes = [] of OptimizedNodeTest::RegularIntLit
 10_000.times { |i| reg_nodes << OptimizedNodeTest::RegularIntLit.new(span, i) }
 after_reg = GC.stats
@@ -165,7 +165,7 @@ opt_visit_time = Benchmark.measure do
 end
 
 reg_visit_time = Benchmark.measure do
-  10_000.times { visitor.visit(reg_node) }  
+  10_000.times { visitor.visit(reg_node) }
 end
 
 opt_visit_rate = 10_000 / opt_visit_time.real
@@ -221,8 +221,8 @@ tree_clone_time = Benchmark.measure do
   1_000.times { tree.clone }
 end
 
-tree_visit_rate = 3_000 / tree_visit_time.real  # 3 nodes per visit
-tree_clone_rate = 3_000 / tree_clone_time.real  # 3 nodes per clone
+tree_visit_rate = 3_000 / tree_visit_time.real # 3 nodes per visit
+tree_clone_rate = 3_000 / tree_clone_time.real # 3 nodes per clone
 
 puts "  Tree traversal: #{tree_visit_rate.round(0)} nodes/sec"
 puts "  Tree cloning: #{tree_clone_rate.round(0)} nodes/sec"
@@ -230,7 +230,7 @@ puts "  Tree cloning: #{tree_clone_rate.round(0)} nodes/sec"
 puts "\n🎯 OPTIMIZATION RESULTS SUMMARY"
 puts "=" * 60
 
-baseline_memory = 90  # From our original baseline
+baseline_memory = 90 # From our original baseline
 target_memory = 64
 
 puts "Memory optimization results:"
@@ -255,7 +255,7 @@ end
 
 puts "\nPerformance optimization results:"
 puts "  ✅ Node creation: #{opt_creation_rate.round(0)} nodes/sec"
-puts "  ✅ Visitor traversal: #{opt_visit_rate.round(0)} visits/sec" 
+puts "  ✅ Visitor traversal: #{opt_visit_rate.round(0)} visits/sec"
 puts "  ✅ Node cloning: #{opt_clone_rate.round(0)} clones/sec"
 puts "  ✅ Tree operations: #{tree_visit_rate.round(0)} nodes/sec"
 

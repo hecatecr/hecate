@@ -2,7 +2,7 @@ require "../spec/spec_helper"
 require "benchmark"
 
 # Comprehensive comparison of all AST optimization approaches
-module OptimizationComparison  
+module OptimizationComparison
   include Hecate::AST
 
   abstract_node Expr
@@ -26,8 +26,8 @@ module OptimizationComparison
   pooled_node PooledIdentifier < Expr, name : String
 
   finalize_ast RegularIntLit, RegularBoolLit, RegularStringLit, RegularIdentifier,
-               OptimizedIntLit, OptimizedBoolLit, OptimizedStringLit, OptimizedIdentifier,
-               PooledIntLit, PooledBoolLit, PooledStringLit, PooledIdentifier
+    OptimizedIntLit, OptimizedBoolLit, OptimizedStringLit, OptimizedIdentifier,
+    PooledIntLit, PooledBoolLit, PooledStringLit, PooledIdentifier
 end
 
 # Test visitor for all node types
@@ -88,20 +88,20 @@ end
 def measure_memory_usage(description : String, &block)
   GC.collect
   sleep 0.01.seconds
-  
+
   before = GC.stats
   nodes = yield
   after = GC.stats
-  
+
   bytes_used = after.total_bytes - before.total_bytes
   per_node = bytes_used / nodes.size
-  
+
   puts "  #{description}:"
   puts "    Total: #{bytes_used} bytes"
   puts "    Per node: #{per_node} bytes"
   puts "    Node count: #{nodes.size}"
-  
-  nodes.clear  # Clear to avoid affecting subsequent measurements
+
+  nodes.clear # Clear to avoid affecting subsequent measurements
   per_node
 end
 
@@ -126,7 +126,7 @@ optimized_int_memory = measure_memory_usage("Optimized IntLit") do
 end
 
 pooled_int_memory = measure_memory_usage("Pooled IntLit") do
-  (1..10_000).map { |i| OptimizationComparison::PooledIntLit.new(span, i % 256) }  # Use values that will be pooled
+  (1..10_000).map { |i| OptimizationComparison::PooledIntLit.new(span, i % 256) } # Use values that will be pooled
 end
 
 puts "\nBoolLit Memory Usage (1,000 nodes):"
@@ -249,7 +249,7 @@ puts "  Total pool memory: ~#{pool_memory[:total_bytes]} bytes"
 puts "\n📊 RESULTS SUMMARY"
 puts "=" * 70
 
-baseline_memory = 90  # Original baseline from our first measurement
+baseline_memory = 90 # Original baseline from our first measurement
 target_memory = 64
 
 puts "Memory Results:"

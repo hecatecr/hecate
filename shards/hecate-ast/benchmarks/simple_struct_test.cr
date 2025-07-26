@@ -7,7 +7,7 @@ module SimpleStructTest
 
   abstract_node Expr
 
-  # Use struct_node for memory optimization  
+  # Use struct_node for memory optimization
   struct_node IntLit < Expr, value : Int32
 
   # Compare with regular class node
@@ -17,7 +17,7 @@ module SimpleStructTest
   abstract class Visitor(T)
     abstract def visit_int_lit(node : IntLit) : T
     abstract def visit_binary_op(node : BinaryOp) : T
-    
+
     def visit(node : ::Hecate::AST::Node) : T
       node.accept(self)
     end
@@ -94,7 +94,7 @@ before_class = GC.stats
 class_array = [] of SimpleStructTest::BinaryOp
 5_000.times do |i|
   left = SimpleStructTest::IntLit.new(span, i)
-  right = SimpleStructTest::IntLit.new(span, i + 1)  
+  right = SimpleStructTest::IntLit.new(span, i + 1)
   class_array << SimpleStructTest::BinaryOp.new(span, left, "+", right)
 end
 after_class = GC.stats
@@ -121,7 +121,7 @@ struct_rate = 100_000 / struct_time.real
 
 mixed_time = Benchmark.measure do
   10_000.times do |i|
-    left = SimpleStructTest::IntLit.new(span, i) 
+    left = SimpleStructTest::IntLit.new(span, i)
     right = SimpleStructTest::IntLit.new(span, i + 1)
     SimpleStructTest::BinaryOp.new(span, left, "+", right)
   end
@@ -165,7 +165,7 @@ if struct_per_node < baseline_memory
   puts "   Savings: #{baseline_memory - struct_per_node} bytes/node"
 else
   puts "❌ No memory improvement over baseline"
-  puts "   Baseline: #{baseline_memory} bytes/node" 
+  puts "   Baseline: #{baseline_memory} bytes/node"
   puts "   Struct: #{struct_per_node} bytes/node"
 end
 

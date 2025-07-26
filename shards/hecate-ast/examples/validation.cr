@@ -152,8 +152,8 @@ puts "=== Example 4: Complex Expression with Multiple Issues ==="
 complex_expr = MathAST::BinOp.new(
   make_span(0, 15),
   "*",
-  MathAST::IntLit.new(make_span(0, 4), 2000),  # Out of range
-  MathAST::IntLit.new(make_span(7, 8), 0)      # Multiply by zero
+  MathAST::IntLit.new(make_span(0, 4), 2000), # Out of range
+  MathAST::IntLit.new(make_span(7, 8), 0)     # Multiply by zero
 )
 
 validator.clear

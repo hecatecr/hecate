@@ -20,7 +20,6 @@ module Hecate
     def self.hint(message : String)
       Hecate.hint(message)
     end
-
   end
 end
 

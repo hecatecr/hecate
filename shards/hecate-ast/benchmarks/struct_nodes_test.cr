@@ -9,7 +9,7 @@ module StructNodeTest
   abstract_node Stmt
 
   # Define struct-based leaf nodes for memory optimization
-  struct_node IntLit < Expr, value : Int32 
+  struct_node IntLit < Expr, value : Int32
   struct_node StringLit < Expr, value : String
   struct_node BoolLit < Expr, value : Bool
   struct_node Identifier < Expr, name : String
@@ -157,7 +157,7 @@ class_creation_time = Benchmark.measure do
 end
 
 struct_rate = 100_000 / struct_creation_time.real
-class_rate = 30_000 / class_creation_time.real  # 3 nodes per iteration
+class_rate = 30_000 / class_creation_time.real # 3 nodes per iteration
 
 puts "Creation performance:"
 puts "  Struct nodes: #{struct_rate.round(0)} nodes/sec"
@@ -170,7 +170,7 @@ pure_struct_tree = StructNodeTest::IntLit.new(span, 42)
 mixed_tree = StructNodeTest::BinaryOp.new(
   span,
   StructNodeTest::IntLit.new(span, 1),
-  "+", 
+  "+",
   StructNodeTest::IntLit.new(span, 2)
 )
 
@@ -183,7 +183,7 @@ mixed_visit_time = Benchmark.measure do
 end
 
 struct_visit_rate = 10_000 / struct_visit_time.real
-mixed_visit_rate = 30_000 / mixed_visit_time.real  # 3 nodes per visit
+mixed_visit_rate = 30_000 / mixed_visit_time.real # 3 nodes per visit
 
 puts "Visitor traversal performance:"
 puts "  Pure struct: #{struct_visit_rate.round(0)} visits/sec"
@@ -205,7 +205,7 @@ if struct_per_node < target_memory
   improvement = ((current_baseline - struct_per_node) / current_baseline * 100).round(1)
   puts "🎉 MEMORY TARGET ACHIEVED!"
   puts "   Target: <#{target_memory} bytes/node"
-  puts "   Achieved: #{struct_per_node} bytes/node" 
+  puts "   Achieved: #{struct_per_node} bytes/node"
   puts "   Improvement vs baseline: #{improvement}% reduction"
 else
   puts "⚠️  Memory target not yet met:"

@@ -7,18 +7,18 @@ end
 # Create a minimal test for validation syntax
 class MinimalValidationTest
   include Hecate::AST
-  
+
   abstract_node Expr
-  
+
   # Test node without validation first
   node IntLit < Expr, value : Int32
-  
+
   # Test the block syntax
   macro test_block(&block)
     puts "Testing block:"
     {{ block.body }}
   end
-  
+
   finalize_ast IntLit
 end
 

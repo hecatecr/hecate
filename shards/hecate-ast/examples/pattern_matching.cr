@@ -7,11 +7,11 @@ require "hecate-core"
 # Define a simple expression language AST
 module ExampleAST
   include Hecate::AST
-  
+
   # Abstract base types
   abstract_node Expr
   abstract_node Stmt
-  
+
   # Expression nodes
   node IntLit < Expr, value : Int32
   node FloatLit < Expr, value : Float64
@@ -19,16 +19,16 @@ module ExampleAST
   node BinaryOp < Expr, left : Expr, right : Expr, operator : String
   node UnaryOp < Expr, operand : Expr, operator : String
   node VarRef < Expr, name : String
-  
+
   # Statement nodes
   node VarDecl < Stmt, name : String, value : Expr?
   node ExprStmt < Stmt, expression : Expr
   node Block < Stmt, statements : Array(Stmt)
   node If < Stmt, condition : Expr, then_branch : Stmt, else_branch : Stmt?
-  
+
   # Finalize AST to generate visitors and type predicates
   finalize_ast IntLit, FloatLit, StringLit, BinaryOp, UnaryOp, VarRef,
-               VarDecl, ExprStmt, Block, If
+    VarDecl, ExprStmt, Block, If
 end
 
 def make_span(start : Int32 = 0, length : Int32 = 1)
@@ -65,7 +65,7 @@ nodes = [
   float_lit.as(Hecate::AST::Node),
   binary_op.as(Hecate::AST::Node),
   var_decl.as(Hecate::AST::Node),
-  expr_stmt.as(Hecate::AST::Node)
+  expr_stmt.as(Hecate::AST::Node),
 ]
 
 puts "1. Type Predicate Methods\n"
@@ -95,17 +95,17 @@ nodes.each_with_index do |node, i|
                   "String literal: \"#{node.value}\""
                 when ExampleAST::BinaryOp
                   left_desc = case node.left
-                             when ExampleAST::IntLit
-                               node.left.as(ExampleAST::IntLit).value.to_s
-                             else
-                               "complex"
-                             end
-                  right_desc = case node.right
                               when ExampleAST::IntLit
-                                node.right.as(ExampleAST::IntLit).value.to_s
+                                node.left.as(ExampleAST::IntLit).value.to_s
                               else
                                 "complex"
                               end
+                  right_desc = case node.right
+                               when ExampleAST::IntLit
+                                 node.right.as(ExampleAST::IntLit).value.to_s
+                               else
+                                 "complex"
+                               end
                   "Binary operation: #{left_desc} #{node.operator} #{right_desc}"
                 when ExampleAST::VarDecl
                   value_desc = node.value ? "with initial value" : "without initial value"
@@ -115,7 +115,7 @@ nodes.each_with_index do |node, i|
                 else
                   "Unknown node type"
                 end
-  
+
   puts "   Node #{i + 1}: #{description}"
 end
 
@@ -124,14 +124,14 @@ puts "   Matching against abstract base types (Expr vs Stmt):"
 
 nodes.each_with_index do |node, i|
   category = case node
-            when ExampleAST::Expr
-              "Expression"
-            when ExampleAST::Stmt
-              "Statement"
-            else
-              "Unknown"
-            end
-  
+             when ExampleAST::Expr
+               "Expression"
+             when ExampleAST::Stmt
+               "Statement"
+             else
+               "Unknown"
+             end
+
   puts "   Node #{i + 1}: #{category}"
 end
 
@@ -187,7 +187,7 @@ end
 puts "\n   Validating exhaustive pattern match:"
 begin
   complete_pattern = [:int_lit, :float_lit, :string_lit, :binary_op, :unary_op, :var_ref,
-                     :var_decl, :expr_stmt, :block, :if]
+                      :var_decl, :expr_stmt, :block, :if]
   Hecate::AST::Node.validate_exhaustive_match(complete_pattern)
   puts "   ✓ Complete pattern validation passed"
 rescue ex
@@ -195,7 +195,7 @@ rescue ex
 end
 
 begin
-  incomplete_pattern = [:int_lit, :binary_op]  # Missing many types
+  incomplete_pattern = [:int_lit, :binary_op] # Missing many types
   Hecate::AST::Node.validate_exhaustive_match(incomplete_pattern)
   puts "   ✗ This should not print - validation should have failed"
 rescue ex
@@ -222,7 +222,7 @@ nodes.each_with_index do |node, i|
                 else
                   "Other type: #{node.node_type_symbol}"
                 end
-  
+
   puts "   Node #{i + 1} (#{node.node_type_symbol}): #{symbol_desc}"
 end
 
@@ -263,7 +263,7 @@ nodes.each_with_index do |node, i|
            else
              "Other node type"
            end
-  
+
   puts "   Node #{i + 1}: #{result}"
 end
 

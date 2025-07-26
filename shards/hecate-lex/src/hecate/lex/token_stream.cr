@@ -118,8 +118,8 @@ module Hecate::Lex
     # Example:
     # ```
     # token = stream.advance
-    # stream.push(token)      # Put it back
-    # same = stream.advance   # Get it again
+    # stream.push(token)    # Put it back
+    # same = stream.advance # Get it again
     # ```
     def push(token : Token(T))
       @pushed_back << token

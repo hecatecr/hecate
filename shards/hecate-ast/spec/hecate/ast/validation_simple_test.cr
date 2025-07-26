@@ -7,12 +7,12 @@ end
 # Simple test to debug the block issue
 class SimpleTest
   include Hecate::AST
-  
+
   abstract_node Expr
-  
+
   # Try without a block first
   node TestNodeSimple < Expr, value : Int32
-  
+
   finalize_ast TestNodeSimple
 end
 

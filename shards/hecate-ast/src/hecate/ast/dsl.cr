@@ -8,7 +8,6 @@ require "./macros/type_predicates"
 # Define macros that will be available when Hecate::AST is included
 module Hecate::AST
   macro included
-    
     # Define an abstract base type
     macro abstract_node(type_name)
       abstract class \{{type_name.id}} < ::Hecate::AST::Node
@@ -23,43 +22,43 @@ module Hecate::AST
     #   struct_node BoolLit < Expr, value: Bool
     # Note: struct_node should only be used for immutable leaf nodes
     macro struct_node(signature, *fields, &block)
-      \{% 
-        # Parse the signature (e.g., "Child < Parent" or just "Child")
-        if signature.is_a?(Call) && signature.name == :<
-          node_name = signature.receiver
-          parent_type = signature.args[0]
-        else
-          node_name = signature
-          parent_type = "::Hecate::AST::Node".id
-        end
+      \{% # Parse the signature (e.g., "Child < Parent" or just "Child")
+
+if signature.is_a?(Call) && signature.name == :<
+  node_name = signature.receiver
+  parent_type = signature.args[0]
+else
+  node_name = signature
+  parent_type = "::Hecate::AST::Node".id
+end
       %}
       
       # Generate the struct node with fields parsing
-      \{% 
-        # Parse fields into structured format (same as regular nodes)
-        parsed_fields = [] of NamedTuple
-        
-        fields.each do |field|
-          if field.is_a?(TypeDeclaration)
-            field_name = field.var.id.stringify
-            field_type = field.type.id.stringify
-            optional = field_type.ends_with?("?") || field_type.includes?(" | ::Nil") || field_type.includes?(" | Nil")
-            
-            # Validate field name
-            reserved_names = ["span", "children", "accept", "clone"]
-            if reserved_names.includes?(field_name)
-              raise "Field name '#{field_name}' is reserved and cannot be used"
-            end
-            
-            parsed_fields << {
-              name: field.var,
-              type: field.type,
-              optional: optional
-            }
-          else
-            raise "Invalid field definition: #{field}. Expected format: name : Type"
-          end
-        end
+      \{% # Parse fields into structured format (same as regular nodes)
+
+parsed_fields = [] of NamedTuple
+
+fields.each do |field|
+  if field.is_a?(TypeDeclaration)
+    field_name = field.var.id.stringify
+    field_type = field.type.id.stringify
+    optional = field_type.ends_with?("?") || field_type.includes?(" | ::Nil") || field_type.includes?(" | Nil")
+
+    # Validate field name
+    reserved_names = ["span", "children", "accept", "clone"]
+    if reserved_names.includes?(field_name)
+      raise "Field name '#{field_name}' is reserved and cannot be used"
+    end
+
+    parsed_fields << {
+      name:     field.var,
+      type:     field.type,
+      optional: optional,
+    }
+  else
+    raise "Invalid field definition: #{field}. Expected format: name : Type"
+  end
+end
       %}
       
       # Generate the struct node implementation
@@ -97,43 +96,43 @@ module Hecate::AST
     #   optimized_node StringLit < Expr, value: String
     #   optimized_node BinaryOp < Expr, left: Expr, operator: String, right: Expr
     macro optimized_node(signature, *fields, &block)
-      \{% 
-        # Parse the signature (e.g., "Child < Parent" or just "Child")
-        if signature.is_a?(Call) && signature.name == :<
-          node_name = signature.receiver
-          parent_type = signature.args[0]
-        else
-          node_name = signature
-          parent_type = "::Hecate::AST::Node".id
-        end
+      \{% # Parse the signature (e.g., "Child < Parent" or just "Child")
+
+if signature.is_a?(Call) && signature.name == :<
+  node_name = signature.receiver
+  parent_type = signature.args[0]
+else
+  node_name = signature
+  parent_type = "::Hecate::AST::Node".id
+end
       %}
       
       # Generate the optimized node with fields parsing
-      \{% 
-        # Parse fields into structured format (same as regular nodes)
-        parsed_fields = [] of NamedTuple
-        
-        fields.each do |field|
-          if field.is_a?(TypeDeclaration)
-            field_name = field.var.id.stringify
-            field_type = field.type.id.stringify
-            optional = field_type.ends_with?("?") || field_type.includes?(" | ::Nil") || field_type.includes?(" | Nil")
-            
-            # Validate field name
-            reserved_names = ["span", "children", "accept", "clone"]
-            if reserved_names.includes?(field_name)
-              raise "Field name '#{field_name}' is reserved and cannot be used"
-            end
-            
-            parsed_fields << {
-              name: field.var,
-              type: field.type,
-              optional: optional
-            }
-          else
-            raise "Invalid field definition: #{field}. Expected format: name : Type"
-          end
-        end
+      \{% # Parse fields into structured format (same as regular nodes)
+
+parsed_fields = [] of NamedTuple
+
+fields.each do |field|
+  if field.is_a?(TypeDeclaration)
+    field_name = field.var.id.stringify
+    field_type = field.type.id.stringify
+    optional = field_type.ends_with?("?") || field_type.includes?(" | ::Nil") || field_type.includes?(" | Nil")
+
+    # Validate field name
+    reserved_names = ["span", "children", "accept", "clone"]
+    if reserved_names.includes?(field_name)
+      raise "Field name '#{field_name}' is reserved and cannot be used"
+    end
+
+    parsed_fields << {
+      name:     field.var,
+      type:     field.type,
+      optional: optional,
+    }
+  else
+    raise "Invalid field definition: #{field}. Expected format: name : Type"
+  end
+end
       %}
       
       # Generate the optimized node class
@@ -172,43 +171,43 @@ module Hecate::AST
     #   pooled_node StringLit < Expr, value: String
     #   pooled_node Identifier < Expr, name: String
     macro pooled_node(signature, *fields, &block)
-      \{% 
-        # Parse the signature (e.g., "Child < Parent" or just "Child")
-        if signature.is_a?(Call) && signature.name == :<
-          node_name = signature.receiver
-          parent_type = signature.args[0]
-        else
-          node_name = signature
-          parent_type = "::Hecate::AST::Node".id
-        end
+      \{% # Parse the signature (e.g., "Child < Parent" or just "Child")
+
+if signature.is_a?(Call) && signature.name == :<
+  node_name = signature.receiver
+  parent_type = signature.args[0]
+else
+  node_name = signature
+  parent_type = "::Hecate::AST::Node".id
+end
       %}
       
       # Generate the pooled node with fields parsing
-      \{% 
-        # Parse fields into structured format (same as regular nodes)
-        parsed_fields = [] of NamedTuple
-        
-        fields.each do |field|
-          if field.is_a?(TypeDeclaration)
-            field_name = field.var.id.stringify
-            field_type = field.type.id.stringify
-            optional = field_type.ends_with?("?") || field_type.includes?(" | ::Nil") || field_type.includes?(" | Nil")
-            
-            # Validate field name
-            reserved_names = ["span", "children", "accept", "clone"]
-            if reserved_names.includes?(field_name)
-              raise "Field name '#{field_name}' is reserved and cannot be used"
-            end
-            
-            parsed_fields << {
-              name: field.var,
-              type: field.type,
-              optional: optional
-            }
-          else
-            raise "Invalid field definition: #{field}. Expected format: name : Type"
-          end
-        end
+      \{% # Parse fields into structured format (same as regular nodes)
+
+parsed_fields = [] of NamedTuple
+
+fields.each do |field|
+  if field.is_a?(TypeDeclaration)
+    field_name = field.var.id.stringify
+    field_type = field.type.id.stringify
+    optional = field_type.ends_with?("?") || field_type.includes?(" | ::Nil") || field_type.includes?(" | Nil")
+
+    # Validate field name
+    reserved_names = ["span", "children", "accept", "clone"]
+    if reserved_names.includes?(field_name)
+      raise "Field name '#{field_name}' is reserved and cannot be used"
+    end
+
+    parsed_fields << {
+      name:     field.var,
+      type:     field.type,
+      optional: optional,
+    }
+  else
+    raise "Invalid field definition: #{field}. Expected format: name : Type"
+  end
+end
       %}
       
       # Generate the pooled node class
@@ -250,44 +249,44 @@ module Hecate::AST
     #     end
     #   end
     macro node(signature, *fields, &block)
-      \{% 
-        # Parse the signature (e.g., "Child < Parent" or just "Child")
-        if signature.is_a?(Call) && signature.name == :<
-          node_name = signature.receiver
-          parent_type = signature.args[0]
-        else
-          node_name = signature
-          parent_type = "::Hecate::AST::Node".id
-        end
+      \{% # Parse the signature (e.g., "Child < Parent" or just "Child")
+
+if signature.is_a?(Call) && signature.name == :<
+  node_name = signature.receiver
+  parent_type = signature.args[0]
+else
+  node_name = signature
+  parent_type = "::Hecate::AST::Node".id
+end
       %}
       
       # Generate the node class with fields parsing restored
-      \{% 
-        # Parse fields into structured format
-        parsed_fields = [] of NamedTuple
-        
-        fields.each do |field|
-          if field.is_a?(TypeDeclaration)
-            field_name = field.var.id.stringify
-            field_type = field.type.id.stringify
-            # Detect optional fields: either ends with ? or is a union with Nil
-            optional = field_type.ends_with?("?") || field_type.includes?(" | ::Nil") || field_type.includes?(" | Nil")
-            
-            # Validate field name
-            reserved_names = ["span", "children", "accept", "clone"]
-            if reserved_names.includes?(field_name)
-              raise "Field name '#{field_name}' is reserved and cannot be used"
-            end
-            
-            parsed_fields << {
-              name: field.var,
-              type: field.type,
-              optional: optional
-            }
-          else
-            raise "Invalid field definition: #{field}. Expected format: name : Type"
-          end
-        end
+      \{% # Parse fields into structured format
+
+parsed_fields = [] of NamedTuple
+
+fields.each do |field|
+  if field.is_a?(TypeDeclaration)
+    field_name = field.var.id.stringify
+    field_type = field.type.id.stringify
+    # Detect optional fields: either ends with ? or is a union with Nil
+    optional = field_type.ends_with?("?") || field_type.includes?(" | ::Nil") || field_type.includes?(" | Nil")
+
+    # Validate field name
+    reserved_names = ["span", "children", "accept", "clone"]
+    if reserved_names.includes?(field_name)
+      raise "Field name '#{field_name}' is reserved and cannot be used"
+    end
+
+    parsed_fields << {
+      name:     field.var,
+      type:     field.type,
+      optional: optional,
+    }
+  else
+    raise "Invalid field definition: #{field}. Expected format: name : Type"
+  end
+end
       %}
       
       
@@ -318,7 +317,7 @@ module Hecate::AST
         end
       \{% end %}
     end
-    
+
     # Generate a builder method for a specific node type
     # Usage: generate_builder(IntLit, value : Int32)
     # Usage: generate_builder(Add, left : Expr, right : Expr)
@@ -379,7 +378,7 @@ module Hecate::AST
         
       end
     end
-    
+
     # Add convenience methods for common AST construction patterns
     # Usage: add_builder_conveniences
     macro add_builder_conveniences
@@ -428,7 +427,7 @@ module Hecate::AST
         end
       end
     end
-    
+
     # Finalize AST definition and generate visitor infrastructure and type predicates
     macro finalize_ast(*node_types)
       # Generate abstract Visitor(T) class

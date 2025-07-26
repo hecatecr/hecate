@@ -7,18 +7,18 @@ require "../src/hecate-ast"
 # Define a simple expression language with validation rules
 module ExampleLang
   include Hecate::AST
-  
+
   # Base types
   abstract_node Expr
   abstract_node Stmt
-  
+
   # Integer literal with range validation
   node IntLit < Expr, value : Int32 do
     if value < -2147483648 || value > 2147483647
       errors << error("Integer literal out of range", span).build
     end
   end
-  
+
   # Variable reference with name validation
   node VarRef < Expr, name : String do
     if name.empty?
@@ -28,14 +28,14 @@ module ExampleLang
     elsif name.size > 255
       errors << warning("Variable name is unusually long", span).build
     end
-    
+
     # Check for reserved keywords
     reserved = ["if", "else", "while", "for", "return", "class", "def"]
     if reserved.includes?(name)
       errors << error("Cannot use reserved keyword '#{name}' as variable name", span).build
     end
   end
-  
+
   # Binary operation with type checking hints
   node BinOp < Expr, op : String, left : Expr, right : Expr do
     # Check for common mistakes
@@ -53,7 +53,7 @@ module ExampleLang
       end
     end
   end
-  
+
   # Variable declaration with initialization check
   node VarDecl < Stmt, name : String, type_name : String?, init : Expr? do
     # Validate variable name
@@ -62,19 +62,19 @@ module ExampleLang
     elsif !name.matches?(/^[a-zA-Z_][a-zA-Z0-9_]*$/)
       errors << error("Invalid variable name: #{name}", span).build
     end
-    
+
     # Warn about uninitialized variables
     if init.nil? && type_name.nil?
       errors << warning("Variable '#{name}' declared without type or initial value", span).build
     end
   end
-  
+
   # Function call with argument validation
   node FuncCall < Expr, name : String, args : Array(Expr) do
     if name.empty?
       errors << error("Function name cannot be empty", span).build
     end
-    
+
     # Check argument count
     if args.size > 255
       errors << error("Too many arguments (maximum: 255)", span).build
@@ -82,7 +82,7 @@ module ExampleLang
       errors << warning("Function '#{name}' has #{args.size} arguments. Consider using named parameters or a configuration object", span).build
     end
   end
-  
+
   finalize_ast IntLit, VarRef, BinOp, VarDecl, FuncCall
 end
 
@@ -156,11 +156,11 @@ puts "=== Example 3: Structural Validation ==="
 # Create a custom node type that can form cycles
 class CyclicExpr < ExampleLang::Expr
   property next_expr : CyclicExpr?
-  
+
   def initialize(span : Hecate::Core::Span)
     super(span)
   end
-  
+
   def children : Array(Hecate::AST::Node)
     if n = @next_expr
       [n] of Hecate::AST::Node
@@ -168,15 +168,15 @@ class CyclicExpr < ExampleLang::Expr
       [] of Hecate::AST::Node
     end
   end
-  
+
   def accept(visitor)
     visitor.visit(self) if visitor.responds_to?(:visit)
   end
-  
+
   def clone : self
     self
   end
-  
+
   def ==(other : self) : Bool
     self.object_id == other.object_id
   end
@@ -188,8 +188,8 @@ expr_b = CyclicExpr.new(make_span(6, 10))
 expr_c = CyclicExpr.new(make_span(11, 15))
 
 expr_a.next_expr = expr_b
-expr_b.next_expr = expr_c  
-expr_c.next_expr = expr_a  # Creates cycle
+expr_b.next_expr = expr_c
+expr_c.next_expr = expr_a # Creates cycle
 
 structural_validator = Hecate::AST::StructuralValidator.new
 structural_validator.validate_structure(expr_a)
@@ -214,14 +214,14 @@ full_validator = Hecate::AST::FullValidator.new
 # Create an AST with both custom validation errors and valid structure
 ast_with_errors = ExampleLang::VarDecl.new(
   make_span(0, 20),
-  "",              # Empty name - error
-  "int",           # Has type
+  "",    # Empty name - error
+  "int", # Has type
   ExampleLang::BinOp.new(
-    make_span(10, 20),
-    "+",
-    ExampleLang::IntLit.new(make_span(10, 11), 0),  # Adding zero - hint
-    ExampleLang::IntLit.new(make_span(15, 17), 42)
-  )
+  make_span(10, 20),
+  "+",
+  ExampleLang::IntLit.new(make_span(10, 11), 0), # Adding zero - hint
+  ExampleLang::IntLit.new(make_span(15, 17), 42)
+)
 )
 
 errors = full_validator.validate(ast_with_errors)
@@ -230,10 +230,10 @@ if full_validator.valid?
   puts "AST is completely valid!"
 else
   puts "Validation found issues:"
-  
+
   # Group by severity
   by_severity = full_validator.errors_by_severity
-  
+
   by_severity.each do |severity, severity_errors|
     puts "\n  #{severity} (#{severity_errors.size}):"
     severity_errors.each do |error|

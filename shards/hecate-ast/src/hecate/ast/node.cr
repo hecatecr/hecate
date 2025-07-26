@@ -24,29 +24,29 @@ module Hecate::AST
     def ==(other : self) : Bool
       # First check if it's the same object
       return true if same?(other)
-      
+
       # Check if spans are equal
       return false unless span == other.span
-      
+
       # Check if both have the same children
       self_children = children
       other_children = other.children
-      
+
       return false unless self_children.size == other_children.size
-      
+
       # Recursively compare all children
       self_children.zip(other_children) do |child1, child2|
         # Handle nil children
         if child1.nil? != child2.nil?
           return false
         end
-        
+
         # If both are non-nil, compare them
         if child1 && child2
           return false unless child1 == child2
         end
       end
-      
+
       true
     end
 
@@ -79,7 +79,7 @@ module Hecate::AST
     # Calculate the depth of the subtree rooted at this node
     def depth : Int32
       return 0 if leaf?
-      
+
       max_child_depth = children.compact.map(&.depth).max? || 0
       max_child_depth + 1
     end
@@ -92,17 +92,17 @@ module Hecate::AST
     # Find all nodes of a specific type in the subtree
     def find_all(type : T.class) : Array(T) forall T
       nodes = [] of T
-      
+
       # Check if this node is of the requested type
       if self.is_a?(T)
         nodes << self
       end
-      
+
       # Recursively search children
       children.compact.each do |child|
         nodes.concat(child.find_all(type))
       end
-      
+
       nodes
     end
 
@@ -110,14 +110,14 @@ module Hecate::AST
     def find_first(type : T.class) : T? forall T
       # Check if this node is of the requested type
       return self if self.is_a?(T)
-      
+
       # Recursively search children
       children.compact.each do |child|
         if result = child.find_first(type)
           return result
         end
       end
-      
+
       nil
     end
 
@@ -134,12 +134,12 @@ module Hecate::AST
     def ancestors : Array(Node)
       nodes = [] of Node
       current = parent
-      
+
       while current
         nodes << current
         current = current.parent
       end
-      
+
       nodes
     end
 
@@ -148,7 +148,7 @@ module Hecate::AST
       node.ancestors.includes?(self)
     end
 
-    # Check if this node is a descendant of the given node  
+    # Check if this node is a descendant of the given node
     def descendant_of?(node : Node) : Bool
       ancestors.includes?(node)
     end
@@ -157,7 +157,7 @@ module Hecate::AST
     def siblings : Array(Node)
       p = parent
       return [] of Node unless p
-      
+
       p.children.compact.reject { |child| child.same?(self) }
     end
   end

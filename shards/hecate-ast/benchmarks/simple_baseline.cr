@@ -64,7 +64,7 @@ end
 # Create a binary tree of given depth
 def create_binary_tree(depth : Int32) : BaselineAST::Expr
   return BaselineAST::IntLit.new(span, 1) if depth == 0
-  
+
   left = create_binary_tree(depth - 1)
   right = create_binary_tree(depth - 1)
   BaselineAST::BinaryOp.new(span, left, "+", right)
@@ -99,7 +99,7 @@ complex_time = Benchmark.measure do
     left = BaselineAST::IntLit.new(span, i)
     right = BaselineAST::IntLit.new(span, i + 1)
     BaselineAST::BinaryOp.new(span, left, "+", right)
-    complex_nodes += 3  # 1 binary + 2 int lits
+    complex_nodes += 3 # 1 binary + 2 int lits
   end
 end
 
@@ -113,7 +113,7 @@ puts
 puts "🚶 VISITOR TRAVERSAL PERFORMANCE"
 puts "-" * 30
 
-tree = create_binary_tree(12)  # 8191 nodes
+tree = create_binary_tree(12) # 8191 nodes
 node_count = (2 ** 13) - 1
 
 traversals = 0
@@ -214,7 +214,7 @@ puts "✅ Memory usage: ~#{estimated_per_node} bytes/node"
 puts
 puts "🎯 OPTIMIZATION TARGETS:"
 puts "   • Node creation: Target >1M nodes/sec"
-puts "   • Visitor dispatch: Target >10M nodes/sec"  
+puts "   • Visitor dispatch: Target >10M nodes/sec"
 puts "   • Memory usage: Target <64 bytes/node"
 puts "   • Search operations: Target >5M nodes/sec"
 puts

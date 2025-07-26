@@ -3,7 +3,7 @@ module Hecate::AST
     # Generate struct-based leaf nodes for memory optimization
     # These structs implement the Node interface but use value semantics
     # for better memory efficiency and cache locality
-    
+
     macro generate_struct_node(name, parent, fields)
       # Generate the struct implementation
       struct {{name}}Struct

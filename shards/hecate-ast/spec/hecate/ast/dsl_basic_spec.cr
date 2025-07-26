@@ -25,23 +25,23 @@ end
 
 class TestIntLit < TestExpr
   getter value : Int32
-  
+
   def initialize(@value : Int32, span : Hecate::Core::Span)
     super(span)
   end
-  
+
   def accept(visitor)
     visitor.visit_test_int_lit(self)
   end
-  
+
   def children : Array(Hecate::AST::Node)
     [] of Hecate::AST::Node
   end
-  
+
   def clone : self
     TestIntLit.new(@value, @span)
   end
-  
+
   def ==(other : self) : Bool
     super && @value == other.value
   end
@@ -50,52 +50,51 @@ end
 class TestAdd < TestExpr
   getter left : TestExpr
   getter right : TestExpr
-  
+
   def initialize(@left : TestExpr, @right : TestExpr, span : Hecate::Core::Span)
     super(span)
   end
-  
+
   def accept(visitor)
     visitor.visit_test_add(self)
   end
-  
+
   def children : Array(Hecate::AST::Node)
     [@left.as(Hecate::AST::Node), @right.as(Hecate::AST::Node)]
   end
-  
+
   def clone : self
     TestAdd.new(@left.clone, @right.clone, @span)
   end
-  
+
   def ==(other : self) : Bool
     super && @left == other.left && @right == other.right
   end
 end
 
 describe "Manual AST Node Implementation" do
-  
   it "creates and uses AST nodes" do
     # Create a simple expression: 1 + 2
     left = TestIntLit.new(1, make_span(0, 1))
     right = TestIntLit.new(2, make_span(2, 3))
     add = TestAdd.new(left, right, make_span(0, 3))
-    
+
     # Test basic properties
     add.left.as(TestIntLit).value.should eq(1)
     add.right.as(TestIntLit).value.should eq(2)
-    
+
     # Test children
     children = add.children
     children.size.should eq(2)
     children[0].should be(left)
     children[1].should be(right)
-    
+
     # Test cloning
     cloned = add.clone
     cloned.should eq(add)
     cloned.should_not be(add)
     cloned.left.should_not be(add.left)
-    
+
     # Test equality
     add2 = TestAdd.new(
       TestIntLit.new(1, make_span(0, 1)),

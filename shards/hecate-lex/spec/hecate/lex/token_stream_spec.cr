@@ -19,24 +19,23 @@ end
 # Helper to create a token array for testing
 def make_stream_tokens
   [
-    make_stream_token(StreamTestTokenKind::Identifier, 0, 3),    # "foo"
-    make_stream_token(StreamTestTokenKind::Plus, 4, 5),           # "+"
-    make_stream_token(StreamTestTokenKind::Number, 6, 8),         # "42"
-    make_stream_token(StreamTestTokenKind::Minus, 9, 10),         # "-"
-    make_stream_token(StreamTestTokenKind::Identifier, 11, 14),   # "bar"
-    make_stream_token(StreamTestTokenKind::EOF, 14, 14),         # EOF
+    make_stream_token(StreamTestTokenKind::Identifier, 0, 3),   # "foo"
+    make_stream_token(StreamTestTokenKind::Plus, 4, 5),         # "+"
+    make_stream_token(StreamTestTokenKind::Number, 6, 8),       # "42"
+    make_stream_token(StreamTestTokenKind::Minus, 9, 10),       # "-"
+    make_stream_token(StreamTestTokenKind::Identifier, 11, 14), # "bar"
+    make_stream_token(StreamTestTokenKind::EOF, 14, 14),        # EOF
   ]
 end
 
 describe Hecate::Lex::TokenStream do
-
   describe "#peek" do
     it "returns the current token without advancing" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
-      
+
       token1 = stream.peek
       token2 = stream.peek
-      
+
       token1.should eq(token2)
       token1.kind.should eq(StreamTestTokenKind::Identifier)
       stream.position.should eq(0)
@@ -45,9 +44,9 @@ describe Hecate::Lex::TokenStream do
     it "raises when peeking past EOF" do
       tokens = [make_stream_token(StreamTestTokenKind::EOF, 0, 0)]
       stream = Hecate::Lex::TokenStream.new(tokens)
-      
+
       stream.advance # Consume EOF
-      
+
       expect_raises(Exception, "Unexpected end of token stream") do
         stream.peek
       end
@@ -57,7 +56,7 @@ describe Hecate::Lex::TokenStream do
   describe "#peek(n)" do
     it "looks ahead n positions" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
-      
+
       stream.peek(0).not_nil!.kind.should eq(StreamTestTokenKind::Identifier)
       stream.peek(1).not_nil!.kind.should eq(StreamTestTokenKind::Plus)
       stream.peek(2).not_nil!.kind.should eq(StreamTestTokenKind::Number)
@@ -67,20 +66,20 @@ describe Hecate::Lex::TokenStream do
 
     it "returns nil when looking beyond EOF" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
-      
+
       stream.peek(6).should be_nil
       stream.peek(100).should be_nil
     end
 
     it "works correctly with pushed-back tokens" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
-      
+
       # Advance and push back
       first = stream.advance
       second = stream.advance
       stream.push(second)
       stream.push(first)
-      
+
       stream.peek(0).not_nil!.kind.should eq(StreamTestTokenKind::Identifier)
       stream.peek(1).not_nil!.kind.should eq(StreamTestTokenKind::Plus)
       stream.peek(2).not_nil!.kind.should eq(StreamTestTokenKind::Number)
@@ -90,11 +89,11 @@ describe Hecate::Lex::TokenStream do
   describe "#advance" do
     it "consumes and returns the current token" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
-      
+
       token = stream.advance
       token.kind.should eq(StreamTestTokenKind::Identifier)
       stream.position.should eq(1)
-      
+
       next_token = stream.peek
       next_token.kind.should eq(StreamTestTokenKind::Plus)
     end
@@ -102,9 +101,9 @@ describe Hecate::Lex::TokenStream do
     it "raises when advancing past EOF" do
       tokens = [make_stream_token(StreamTestTokenKind::EOF, 0, 0)]
       stream = Hecate::Lex::TokenStream.new(tokens)
-      
+
       stream.advance # Consume EOF
-      
+
       expect_raises(Exception, "Unexpected end of token stream") do
         stream.advance
       end
@@ -114,15 +113,15 @@ describe Hecate::Lex::TokenStream do
   describe "#push" do
     it "pushes tokens back onto the stream" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
-      
+
       # Advance twice
       first = stream.advance
       second = stream.advance
-      
+
       # Push back in reverse order
       stream.push(second)
       stream.push(first)
-      
+
       # Should get them back in LIFO order
       stream.advance.should eq(first)
       stream.advance.should eq(second)
@@ -130,13 +129,13 @@ describe Hecate::Lex::TokenStream do
 
     it "allows multiple push operations" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
-      
+
       tokens = [] of Hecate::Lex::Token(StreamTestTokenKind)
       3.times { tokens << stream.advance }
-      
+
       # Push all back
       tokens.reverse.each { |t| stream.push(t) }
-      
+
       # Should get them back in original order
       3.times do |i|
         stream.advance.should eq(tokens[i])
@@ -152,20 +151,20 @@ describe Hecate::Lex::TokenStream do
 
     it "returns true when all tokens consumed" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
-      
+
       6.times { stream.advance }
       stream.eof?.should be_true
     end
 
     it "returns false when tokens are pushed back" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
-      
+
       # Consume all
       tokens = [] of Hecate::Lex::Token(StreamTestTokenKind)
       6.times { tokens << stream.advance }
-      
+
       stream.eof?.should be_true
-      
+
       # Push one back
       stream.push(tokens.last)
       stream.eof?.should be_false
@@ -175,7 +174,7 @@ describe Hecate::Lex::TokenStream do
   describe "#position" do
     it "tracks the position in the original array" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
-      
+
       stream.position.should eq(0)
       stream.advance
       stream.position.should eq(1)
@@ -185,10 +184,10 @@ describe Hecate::Lex::TokenStream do
 
     it "is not affected by push operations" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
-      
+
       token = stream.advance
       stream.position.should eq(1)
-      
+
       stream.push(token)
       stream.position.should eq(1) # Unchanged
     end
@@ -197,12 +196,12 @@ describe Hecate::Lex::TokenStream do
   describe "#remaining" do
     it "counts remaining tokens including pushed back" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
-      
+
       stream.remaining.should eq(6)
-      
+
       stream.advance
       stream.remaining.should eq(5)
-      
+
       # Push back
       stream.push(make_stream_token(StreamTestTokenKind::Plus, 0, 0))
       stream.remaining.should eq(6)
@@ -218,9 +217,9 @@ describe Hecate::Lex::TokenStream do
         make_stream_token(StreamTestTokenKind::Number, 10, 12),
       ]
       stream = Hecate::Lex::TokenStream.new(tokens)
-      
+
       identifiers = stream.consume_while { |t| t.kind == StreamTestTokenKind::Identifier }
-      
+
       identifiers.size.should eq(2)
       identifiers.all? { |t| t.kind == StreamTestTokenKind::Identifier }.should be_true
       stream.peek.kind.should eq(StreamTestTokenKind::Plus)
@@ -228,9 +227,9 @@ describe Hecate::Lex::TokenStream do
 
     it "returns empty array when no tokens match" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
-      
+
       numbers = stream.consume_while { |t| t.kind == StreamTestTokenKind::Number }
-      
+
       numbers.should be_empty
       stream.position.should eq(0)
     end
@@ -239,7 +238,7 @@ describe Hecate::Lex::TokenStream do
   describe "#expect" do
     it "consumes token when kind matches" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
-      
+
       token = stream.expect(StreamTestTokenKind::Identifier)
       token.kind.should eq(StreamTestTokenKind::Identifier)
       stream.position.should eq(1)
@@ -247,7 +246,7 @@ describe Hecate::Lex::TokenStream do
 
     it "raises when kind doesn't match" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
-      
+
       expect_raises(Exception, /Expected Number but found Identifier/) do
         stream.expect(StreamTestTokenKind::Number)
       end
@@ -256,7 +255,7 @@ describe Hecate::Lex::TokenStream do
     it "raises when at EOF" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
       6.times { stream.advance }
-      
+
       expect_raises(Exception, /Expected Plus but found EOF/) do
         stream.expect(StreamTestTokenKind::Plus)
       end
@@ -266,7 +265,7 @@ describe Hecate::Lex::TokenStream do
   describe "#try_match" do
     it "consumes and returns token when kind matches" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
-      
+
       token = stream.try_match(StreamTestTokenKind::Identifier)
       token.should_not be_nil
       token.not_nil!.kind.should eq(StreamTestTokenKind::Identifier)
@@ -275,7 +274,7 @@ describe Hecate::Lex::TokenStream do
 
     it "returns nil when kind doesn't match" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
-      
+
       token = stream.try_match(StreamTestTokenKind::Number)
       token.should be_nil
       stream.position.should eq(0) # No advancement
@@ -284,7 +283,7 @@ describe Hecate::Lex::TokenStream do
     it "returns nil at EOF" do
       stream = Hecate::Lex::TokenStream.new(make_stream_tokens)
       6.times { stream.advance }
-      
+
       token = stream.try_match(StreamTestTokenKind::Plus)
       token.should be_nil
     end

@@ -117,13 +117,13 @@ module Hecate::AST
         end
       end
     end
-    
+
     # Macro to extend finalize_ast with type predicate generation
     # This is called automatically when finalize_ast is used
     macro finalize_ast_with_predicates(*node_types)
       # First call the original visitor generation
       ::Hecate::AST.finalize_ast_visitors(\{{node_types.splat}})
-      
+
       # Then generate type predicates
       ::Hecate::AST::Macros.generate_type_predicates(\{{node_types.splat}})
     end

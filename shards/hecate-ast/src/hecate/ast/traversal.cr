@@ -48,7 +48,7 @@ module Hecate::AST
     # ```
     def self.level_order(node : Node, &block : Node ->) : Nil
       queue = Deque(Node).new([node])
-      
+
       while current_node = queue.shift?
         block.call(current_node)
         queue.concat(current_node.children)
@@ -65,11 +65,11 @@ module Hecate::AST
     # ```
     def self.find_all(node : Node, type : T.class) : Array(T) forall T
       results = [] of T
-      
+
       preorder(node) do |n|
         results << n if n.is_a?(T)
       end
-      
+
       results
     end
 

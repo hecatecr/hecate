@@ -20,7 +20,7 @@ class TestNode < Hecate::AST::Node
   def clone : self
     TestNode.new(@value, @child.try(&.clone), @span)
   end
-  
+
   def ==(other : self) : Bool
     super && @value == other.value
   end
@@ -44,7 +44,7 @@ class TestLeafNode < Hecate::AST::Node
   def clone : self
     TestLeafNode.new(@value, @span)
   end
-  
+
   def ==(other : self) : Bool
     super && @value == other.value
   end
@@ -77,7 +77,6 @@ def make_span(start_byte : Int32, end_byte : Int32, source_id : UInt32 = 0_u32)
 end
 
 describe Hecate::AST::Node do
-
   describe "#initialize" do
     it "stores the span" do
       span = make_span(0, 5)
@@ -119,10 +118,10 @@ describe Hecate::AST::Node do
       span = make_span(0, 5)
       child1 = TestLeafNode.new(42, span)
       child2 = TestLeafNode.new(42, span)
-      
+
       parent1 = TestNode.new("parent", child1, span)
       parent2 = TestNode.new("parent", child2, span)
-      
+
       parent1.should eq(parent2)
     end
 
@@ -130,20 +129,20 @@ describe Hecate::AST::Node do
       span = make_span(0, 5)
       child1 = TestLeafNode.new(42, span)
       child2 = TestLeafNode.new(43, span)
-      
+
       parent1 = TestNode.new("parent", child1, span)
       parent2 = TestNode.new("parent", child2, span)
-      
+
       parent1.should_not eq(parent2)
     end
 
     it "handles nil children correctly" do
       span = make_span(0, 5)
       child = TestLeafNode.new(42, span)
-      
+
       parent1 = TestNode.new("parent", child, span)
       parent2 = TestNode.new("parent", nil, span)
-      
+
       parent1.should_not eq(parent2)
     end
   end
@@ -153,7 +152,7 @@ describe Hecate::AST::Node do
       span = make_span(0, 5)
       original = TestLeafNode.new(42, span)
       cloned = original.clone
-      
+
       cloned.should eq(original)
       cloned.should_not be(original)
       cloned.span.should eq(original.span)
@@ -164,7 +163,7 @@ describe Hecate::AST::Node do
       child = TestLeafNode.new(42, span)
       original = TestNode.new("parent", child, span)
       cloned = original.clone
-      
+
       cloned.should eq(original)
       cloned.should_not be(original)
       cloned.child.should_not be(original.child)
@@ -175,9 +174,9 @@ describe Hecate::AST::Node do
       left = TestLeafNode.new(1, span)
       right = TestLeafNode.new(2, span)
       binary = TestBinaryNode.new(left, right, span)
-      
+
       cloned = binary.clone
-      
+
       cloned.should eq(binary)
       cloned.should_not be(binary)
       cloned.left.should_not be(binary.left)
@@ -234,7 +233,7 @@ describe Hecate::AST::Node do
       leaf2 = TestLeafNode.new(2, span)
       binary = TestBinaryNode.new(leaf1, leaf2, span)
       root = TestNode.new("root", binary, span)
-      
+
       root.depth.should eq(2)
     end
   end
@@ -251,7 +250,7 @@ describe Hecate::AST::Node do
       leaf1 = TestLeafNode.new(1, span)
       leaf2 = TestLeafNode.new(2, span)
       binary = TestBinaryNode.new(leaf1, leaf2, span)
-      
+
       binary.node_count.should eq(3) # binary + 2 leaves
     end
   end
@@ -262,7 +261,7 @@ describe Hecate::AST::Node do
       leaf1 = TestLeafNode.new(1, span)
       leaf2 = TestLeafNode.new(2, span)
       binary = TestBinaryNode.new(leaf1, leaf2, span)
-      
+
       leaves = binary.find_all(TestLeafNode)
       leaves.size.should eq(2)
       leaves.should contain(leaf1)
@@ -272,7 +271,7 @@ describe Hecate::AST::Node do
     it "includes self if it matches the type" do
       span = make_span(0, 5)
       node = TestLeafNode.new(42, span)
-      
+
       result = node.find_all(TestLeafNode)
       result.size.should eq(1)
       result.first.should be(node)
@@ -281,7 +280,7 @@ describe Hecate::AST::Node do
     it "returns empty array when no matches found" do
       span = make_span(0, 5)
       node = TestLeafNode.new(42, span)
-      
+
       result = node.find_all(TestBinaryNode)
       result.should be_empty
     end
@@ -293,7 +292,7 @@ describe Hecate::AST::Node do
       leaf1 = TestLeafNode.new(1, span)
       leaf2 = TestLeafNode.new(2, span)
       binary = TestBinaryNode.new(leaf1, leaf2, span)
-      
+
       result = binary.find_first(TestLeafNode)
       result.should eq(leaf1)
     end
@@ -301,7 +300,7 @@ describe Hecate::AST::Node do
     it "returns self if it matches" do
       span = make_span(0, 5)
       node = TestLeafNode.new(42, span)
-      
+
       result = node.find_first(TestLeafNode)
       result.should be(node)
     end
@@ -309,7 +308,7 @@ describe Hecate::AST::Node do
     it "returns nil when no match found" do
       span = make_span(0, 5)
       node = TestLeafNode.new(42, span)
-      
+
       result = node.find_first(TestBinaryNode)
       result.should be_nil
     end
@@ -320,14 +319,14 @@ describe Hecate::AST::Node do
       span = make_span(0, 5)
       leaf = TestLeafNode.new(42, span)
       parent = TestNode.new("parent", leaf, span)
-      
+
       parent.contains?(TestLeafNode).should be_true
     end
 
     it "returns false when type is not found" do
       span = make_span(0, 5)
       node = TestLeafNode.new(42, span)
-      
+
       node.contains?(TestBinaryNode).should be_false
     end
   end
@@ -337,7 +336,7 @@ describe Hecate::AST::Node do
       span = make_span(0, 5)
       child = TestLeafNode.new(42, span)
       parent = TestNode.new("parent", child, span)
-      
+
       child.parent = parent
       child.parent.should be(parent)
     end
@@ -347,10 +346,10 @@ describe Hecate::AST::Node do
       leaf = TestLeafNode.new(42, span)
       middle = TestNode.new("middle", leaf, span)
       root = TestNode.new("root", middle, span)
-      
+
       leaf.parent = middle
       middle.parent = root
-      
+
       ancestors = leaf.ancestors
       ancestors.size.should eq(2)
       ancestors[0].should be(middle)
@@ -362,10 +361,10 @@ describe Hecate::AST::Node do
       leaf = TestLeafNode.new(42, span)
       middle = TestNode.new("middle", leaf, span)
       root = TestNode.new("root", middle, span)
-      
+
       leaf.parent = middle
       middle.parent = root
-      
+
       root.ancestor_of?(leaf).should be_true
       leaf.descendant_of?(root).should be_true
       leaf.ancestor_of?(root).should be_false
@@ -376,14 +375,14 @@ describe Hecate::AST::Node do
       left = TestLeafNode.new(1, span)
       right = TestLeafNode.new(2, span)
       parent = TestBinaryNode.new(left, right, span)
-      
+
       left.parent = parent
       right.parent = parent
-      
+
       left_siblings = left.siblings
       left_siblings.size.should eq(1)
       left_siblings.first.should be(right)
-      
+
       right_siblings = right.siblings
       right_siblings.size.should eq(1)
       right_siblings.first.should be(left)

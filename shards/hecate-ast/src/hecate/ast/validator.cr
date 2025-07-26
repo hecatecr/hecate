@@ -2,8 +2,35 @@ require "./node"
 require "hecate-core"
 
 module Hecate::AST
-  # ASTValidator is a visitor that traverses AST nodes and collects validation errors
-  # It automatically calls the validate method on nodes that define validation rules
+  # A visitor that traverses an AST and collects validation errors from nodes that implement custom validation rules.
+  # 
+  # This validator works with the validation DSL to collect errors from nodes that define a `validate` method.
+  # It categorizes diagnostics by severity level and provides methods to check validation status.
+  #
+  # ## Example
+  # ```
+  # # Define nodes with validation rules
+  # module MyAST
+  #   include Hecate::AST
+  #   
+  #   node PositiveInt < Expr, value : Int32 do
+  #     if value < 0
+  #       errors << error("Value must be positive", span).build
+  #     end
+  #   end
+  # end
+  # 
+  # # Validate an AST
+  # validator = Hecate::AST::ASTValidator.new
+  # validator.visit(root_node)
+  # 
+  # if validator.valid?
+  #   puts "AST is valid!"
+  # else
+  #   puts "Found #{validator.error_count} errors"
+  #   validator.errors.each { |e| puts e }
+  # end
+  # ```
   class ASTValidator
     getter errors : Array(Hecate::Core::Diagnostic)
 

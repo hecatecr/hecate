@@ -651,7 +651,7 @@
               "10.1"
             ],
             "details": "Update the node macro in the AST DSL to accept an optional block parameter. When a block is provided, generate a validate method that returns Array(Hecate::Core::Diagnostic)? with the validation logic from the block. Ensure the generated method has access to node instance variables and can create diagnostics with proper spans. Handle cases where no validation block is provided (no validate method generated).",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test node generation with and without validation blocks, verify generated validate methods compile correctly, ensure validation logic can access all node fields and the span property"
           },
           {
@@ -662,7 +662,7 @@
               "10.2"
             ],
             "details": "Implement ASTValidator as a concrete visitor that accumulates diagnostics. Override the visit method to check if nodes respond to validate, call the method if present, and collect any returned diagnostics. Ensure proper error accumulation and handle nested node validation. The visitor should maintain an errors array and provide methods to retrieve all collected diagnostics after traversal.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test validator traversal on AST with mixed validated/non-validated nodes, verify all validation errors are collected, test deep AST structures, ensure visitor doesn't fail on nodes without validation"
           },
           {
@@ -828,7 +828,7 @@
     ],
     "metadata": {
       "created": "2025-07-12T21:43:14.427Z",
-      "updated": "2025-07-26T02:28:03.925Z",
+      "updated": "2025-07-26T04:59:32.836Z",
       "description": "Tasks for master context"
     }
   }

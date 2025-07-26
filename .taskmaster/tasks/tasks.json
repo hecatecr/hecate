@@ -498,7 +498,7 @@
         "dependencies": [
           5
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -506,7 +506,7 @@
             "description": "Set up the Builder module structure with necessary imports and foundation for the DSL",
             "dependencies": [],
             "details": "Create src/hecate/ast/builder.cr with the module structure, extend self for module methods, and set up the basic framework for the generate_builders macro. Include necessary requires for Span and node definitions.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test that the Builder module is properly defined and accessible, verify that it can be included/extended without errors"
           },
           {
@@ -517,7 +517,7 @@
               "8.1"
             ],
             "details": "Implement the generate_builders macro that accepts an enabled parameter (default true). The macro should iterate through @@node_definitions and generate a method for each node type with lowercase naming convention. Each method should accept the node's fields as parameters plus an optional span parameter with default Span.new(0, 0).",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test that builder methods are generated for all defined node types, verify method signatures match node field requirements, ensure optional span parameter works correctly"
           },
           {
@@ -528,7 +528,7 @@
               "8.2"
             ],
             "details": "Implement the build(&block) method that uses 'with self yield' to allow DSL-style construction without explicitly referencing Builder. This enables syntax like: Builder.build { add(int(1), int(2)) }",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test that build blocks properly delegate method calls to Builder module, verify nested construction works, ensure return values are correctly propagated"
           },
           {
@@ -539,7 +539,7 @@
               "8.3"
             ],
             "details": "Add support for building nested structures efficiently, including automatic span calculation for parent nodes based on child spans, support for optional fields with nil defaults, and convenience methods for common patterns like binary operations or block statements.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test complex nested AST construction, verify span propagation in nested structures, test optional field handling, ensure deeply nested structures build correctly"
           },
           {
@@ -550,7 +550,7 @@
               "8.4"
             ],
             "details": "Create example files demonstrating builder usage for common patterns (expressions, statements, declarations). Write integration tests that build complete AST structures using the builder DSL and verify they match manually constructed ASTs. Include examples in documentation showing before/after comparisons of manual vs builder construction.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test that all example code runs without errors, verify builder-constructed ASTs are identical to manually constructed ones, ensure examples cover all major node types and patterns"
           }
         ]
@@ -700,7 +700,7 @@
           9,
           10
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -708,7 +708,7 @@
             "description": "Set up comprehensive profiling tools and create benchmark suites to measure current AST performance baseline for nodes, visitors, and transformations",
             "dependencies": [],
             "details": "Create benchmark harness in spec/benchmarks/ast_performance_spec.cr with tests for: node creation speed (1M nodes), visitor traversal performance, transformation overhead, memory allocation patterns. Use Crystal's built-in Benchmark module and memory profiler. Generate baseline metrics for comparison.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Run benchmarks on various AST sizes (10, 100, 1K, 10K, 100K nodes), measure time and memory for each operation type, create performance regression tests with acceptable thresholds"
           },
           {
@@ -718,8 +718,8 @@
             "dependencies": [
               "11.1"
             ],
-            "details": "Identify leaf nodes that are immutable and don't need inheritance (IntLit, FloatLit, StringLit, BoolLit, Identifier). Convert these to structs while maintaining Node interface compatibility. Implement hybrid approach where struct nodes are wrapped when polymorphism is needed. Profile memory savings and access speed improvements.",
-            "status": "pending",
+            "details": "Identify leaf nodes that are immutable and don't need inheritance (IntLit, FloatLit, StringLit, BoolLit, Identifier). Convert these to structs while maintaining Node interface compatibility. Implement hybrid approach where struct nodes are wrapped when polymorphism is needed. Profile memory savings and access speed improvements.\n<info added on 2025-07-26T06:31:18.111Z>\nImplementation started with memory baseline analysis showing 90 bytes per node. Target established for 30-50% memory reduction to achieve 54-63 bytes per node through struct-based approach. Initiating hybrid struct/class system design where leaf nodes (IntLit, StringLit, BoolLit, Identifier, FloatLit) are implemented as structs but wrapped when polymorphic behavior is required. This maintains Node interface compatibility while capturing memory efficiency benefits for immutable literals.\n</info added on 2025-07-26T06:31:18.111Z>",
+            "status": "done",
             "testStrategy": "Verify struct nodes maintain API compatibility, benchmark memory usage reduction (target 30-50% for literals), ensure no functionality regression, test struct/class interoperability"
           },
           {
@@ -730,7 +730,7 @@
               "11.2"
             ],
             "details": "Implement thread-safe pools for: IntLit (-128 to 127), BoolLit (true/false singletons), common Identifier nodes (keywords, common variable names). Add pool statistics tracking and configurable pool sizes. Implement pool clearing for long-running processes. Consider weak references for automatic cleanup.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify pooled nodes are properly shared, test thread safety with concurrent access, measure allocation reduction (target 70% for pooled values), test pool memory limits work correctly"
           },
           {
@@ -741,7 +741,7 @@
               "11.1"
             ],
             "details": "Generate compile-time jump tables mapping node types to visitor methods. Implement type ID system for fast lookups. Create specialized visitors for common patterns (e.g., find nodes of type, collect all identifiers). Add visitor method inlining hints. Consider generating specialized visitors for hot paths identified by profiling.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Benchmark visitor performance improvement (target 2-3x speedup), verify all node types dispatch correctly, test specialized visitors produce same results as generic ones, measure impact on binary size"
           },
           {
@@ -753,7 +753,7 @@
               "11.4"
             ],
             "details": "Implement smart node cloning that shares unchanged subtrees. Add reference counting or generation tracking to detect modifications. Create transformation API that automatically applies COW semantics. Optimize common transformation patterns (single node replacement, subtree substitution). Add debugging aids to track sharing effectiveness.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify transformations produce correct results with COW, measure memory savings for partial tree modifications (target 80% reduction), test concurrent transformations work correctly, benchmark transformation speed remains acceptable"
           }
         ]
@@ -828,7 +828,7 @@
     ],
     "metadata": {
       "created": "2025-07-12T21:43:14.427Z",
-      "updated": "2025-07-26T05:12:00.955Z",
+      "updated": "2025-07-26T06:39:22.791Z",
       "description": "Tasks for master context"
     }
   }

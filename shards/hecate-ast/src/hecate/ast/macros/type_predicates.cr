@@ -4,14 +4,36 @@ module Hecate::AST
     # This creates methods like `int_lit?`, `add?`, etc. for each node type
     # enabling idiomatic Crystal code like: `if node.binary_expr?`
     macro generate_type_predicates(*node_types)
-      # Generate predicate methods on each specific node class
+      # Generate predicate methods on each specific node type (class or struct)
       {% for node_type in node_types %}
-        class {{node_type}}
-          # Predicate method returns true for this specific type
-          def {{node_type.id.underscore}}? : Bool
-            true
+        # Check if this is a struct type (will have StructType alias)
+        {% if @type.has_constant?("#{node_type}Struct") %}
+          # For struct nodes, add predicate to the struct itself
+          struct {{node_type}}Struct
+            # Predicate method returns true for this specific type
+            def {{node_type.id.underscore}}? : Bool
+              true
+            end
           end
-        end
+          
+          # Also add to the wrapper class if it exists
+          {% if @type.has_constant?("#{node_type}Wrapper") %}
+            class {{node_type}}Wrapper
+              # Predicate method returns true for this specific type
+              def {{node_type.id.underscore}}? : Bool
+                true
+              end
+            end
+          {% end %}
+        {% else %}
+          # For regular class nodes
+          class {{node_type}}
+            # Predicate method returns true for this specific type
+            def {{node_type.id.underscore}}? : Bool
+              true
+            end
+          end
+        {% end %}
       {% end %}
       
       # Generate predicate methods on the base Node class that return false

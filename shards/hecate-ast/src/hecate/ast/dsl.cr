@@ -16,6 +16,11 @@ module Hecate::AST
     #   node IntLit < Expr, value: Int32
     #   node Add < Expr, left: Expr, right: Expr
     #   node VarDecl < Stmt, name: String, value: Expr?
+    #   node IntLit < Expr, value: Int32 do
+    #     validate do
+    #       errors << error("Value must be positive", span) if value < 0
+    #     end
+    #   end
     macro node(signature, *fields)
       \{% 
         # Parse the signature (e.g., "Child < Parent" or just "Child")
@@ -26,7 +31,10 @@ module Hecate::AST
           node_name = signature
           parent_type = "::Hecate::AST::Node".id
         end
-        
+      %}
+      
+      # Generate the node class with fields parsing restored
+      \{% 
         # Parse fields into structured format
         parsed_fields = [] of NamedTuple
         
@@ -54,8 +62,7 @@ module Hecate::AST
         end
       %}
       
-      # Generate the node class
-      ::Hecate::AST::Macros.generate_node_class(\{{node_name}}, \{{parent_type}}, \{{parsed_fields}})
+      ::Hecate::AST::Macros.generate_node_class(\{{node_name}}, \{{parent_type}}, \{{parsed_fields}}, nil)
     end
     
     # Finalize AST definition and generate visitor infrastructure and type predicates

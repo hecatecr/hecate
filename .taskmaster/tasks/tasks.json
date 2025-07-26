@@ -565,7 +565,7 @@
         "dependencies": [
           6
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -573,7 +573,7 @@
             "description": "Create the PrettyPrinter visitor that traverses AST nodes and generates human-readable formatted output",
             "dependencies": [],
             "details": "Implement in src/hecate/ast/pretty_printer.cr with base visitor pattern, depth tracking for indentation, configurable indent size, and helper methods for formatting common patterns like lists and nested structures",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test with various AST structures including deeply nested nodes, verify correct indentation levels, ensure line breaks are placed appropriately, test with different indent sizes"
           },
           {
@@ -582,7 +582,7 @@
             "description": "Create SExpPrinter visitor for generating S-expression representations of AST nodes",
             "dependencies": [],
             "details": "Implement SExpPrinter class that outputs Lisp-style S-expressions, handle proper parentheses nesting, escape special characters in string literals, format lists and atoms correctly",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify S-expression output matches expected format, test with complex nested expressions, ensure special characters are escaped, validate output can be parsed by S-expression parsers"
           },
           {
@@ -591,7 +591,7 @@
             "description": "Add JSON::Serializable support and custom to_json methods for all AST node types",
             "dependencies": [],
             "details": "Add to_json(JSON::Builder) method to base Node class, serialize node type name, span information, and all node-specific fields, handle recursive serialization of child nodes, ensure proper JSON structure",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test JSON output is valid and parseable, verify all node fields are included, test round-trip serialization/deserialization, ensure spans are preserved in JSON format"
           },
           {
@@ -603,7 +603,7 @@
               "9.2"
             ],
             "details": "Add debug_tree method for ASCII tree visualization, implement compact single-line format for logging, create configurable verbosity levels, add source code snippet extraction using span information",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test tree visualization with various AST structures, verify compact format fits on single line, test source snippet extraction with different span sizes, validate verbosity filtering works correctly"
           },
           {
@@ -617,7 +617,7 @@
               "9.4"
             ],
             "details": "Add PrettyPrintOptions struct for customization, implement format auto-detection based on output destination, integrate with existing Visitor pattern infrastructure, add convenience methods to Node class for all formats",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test configuration options affect output correctly, verify format auto-detection works for TTY vs file output, ensure all convenience methods work on any Node subclass, test integration with existing visitor pattern"
           }
         ]
@@ -639,8 +639,8 @@
             "title": "Design validation rule DSL syntax and macro structure",
             "description": "Define the syntax for attaching validation rules to AST nodes within the DSL, including how rules are specified in the node definition block and how they integrate with the existing macro system",
             "dependencies": [],
-            "details": "Research and design the syntax for validation blocks within node definitions. Consider how to pass validation logic as a macro block, how to access node fields within validation rules, and how to integrate with the existing node macro. Design should support both simple field validations and complex cross-field validations. Example syntax: `node Add < BinaryOp, left: Expr, right: Expr do validate { errors << diagnostic if left.type != right.type } end`",
-            "status": "pending",
+            "details": "Research and design the syntax for validation blocks within node definitions. Consider how to pass validation logic as a macro block, how to access node fields within validation rules, and how to integrate with the existing node macro. Design should support both simple field validations and complex cross-field validations. Example syntax: `node Add < BinaryOp, left: Expr, right: Expr do validate { errors << diagnostic if left.type != right.type } end`\n<info added on 2025-07-26T01:56:09.117Z>\n**Validation DSL Design Completed Successfully**\n\nThe validation rule syntax has been finalized with a block-based approach that integrates cleanly with the existing node macro system. The design supports `node Name < Parent, field: Type do validate do ... end end` syntax with direct field access within validation blocks.\n\nKey design decisions made:\n- Uses `&validation_block` parameter to capture validation logic during macro expansion\n- Provides helper methods (`error()`, `warning()`, `note()`) for ergonomic diagnostic creation\n- ASTValidator class design handles traversal and error collection across the entire AST\n- Full integration with Hecate::Core diagnostic system preserves source spans and formatting\n- Optional validation blocks ensure backward compatibility with existing node definitions\n\nThe syntax follows Crystal conventions using familiar block patterns similar to `record` macros and spec DSLs. Cross-field validations are supported through direct access to all node fields within the validation context.\n\nDesign is complete and ready for macro implementation in subtask 10.2.\n</info added on 2025-07-26T01:56:09.117Z>",
+            "status": "done",
             "testStrategy": "Create test cases with various validation rule syntaxes, verify macro expansion handles validation blocks correctly, test that validation rules can access node fields and methods"
           },
           {
@@ -651,7 +651,7 @@
               "10.1"
             ],
             "details": "Update the node macro in the AST DSL to accept an optional block parameter. When a block is provided, generate a validate method that returns Array(Hecate::Core::Diagnostic)? with the validation logic from the block. Ensure the generated method has access to node instance variables and can create diagnostics with proper spans. Handle cases where no validation block is provided (no validate method generated).",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Test node generation with and without validation blocks, verify generated validate methods compile correctly, ensure validation logic can access all node fields and the span property"
           },
           {
@@ -828,7 +828,7 @@
     ],
     "metadata": {
       "created": "2025-07-12T21:43:14.427Z",
-      "updated": "2025-07-25T22:28:41.253Z",
+      "updated": "2025-07-26T02:28:03.925Z",
       "description": "Tasks for master context"
     }
   }

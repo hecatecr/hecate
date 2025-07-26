@@ -36,6 +36,12 @@ module Hecate::AST
               # For optional fields, check if it's a basic type
               {% if field_type.ends_with?("?") %}
                 {% base_type = field_type[0..-2] %}
+              {% elsif field_type.includes?(" | ::Nil") %}
+                # Extract the base type from "Type | ::Nil"
+                {% base_type = field_type.split(" | ::Nil")[0] %}
+              {% elsif field_type.includes?(" | Nil") %}
+                # Extract the base type from "Type | Nil"  
+                {% base_type = field_type.split(" | Nil")[0] %}
               {% else %}
                 # Assume the field_type represents the optional type without ?
                 {% base_type = field_type %}

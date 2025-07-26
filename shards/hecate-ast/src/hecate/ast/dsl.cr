@@ -34,7 +34,8 @@ module Hecate::AST
           if field.is_a?(TypeDeclaration)
             field_name = field.var.id.stringify
             field_type = field.type.id.stringify
-            optional = field_type.ends_with?("?")
+            # Detect optional fields: either ends with ? or is a union with Nil
+            optional = field_type.ends_with?("?") || field_type.includes?(" | ::Nil") || field_type.includes?(" | Nil")
             
             # Validate field name
             reserved_names = ["span", "children", "accept", "clone"]

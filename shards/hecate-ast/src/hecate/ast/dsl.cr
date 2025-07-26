@@ -21,7 +21,7 @@ module Hecate::AST
     #       errors << error("Value must be positive", span) if value < 0
     #     end
     #   end
-    macro node(signature, *fields)
+    macro node(signature, *fields, &block)
       \{% 
         # Parse the signature (e.g., "Child < Parent" or just "Child")
         if signature.is_a?(Call) && signature.name == :<
@@ -62,7 +62,32 @@ module Hecate::AST
         end
       %}
       
-      ::Hecate::AST::Macros.generate_node_class(\{{node_name}}, \{{parent_type}}, \{{parsed_fields}}, nil)
+      # Generate the node class directly here to preserve block context
+      ::Hecate::AST::Macros.generate_node_class(\{{node_name}}, \{{parent_type}}, \{{parsed_fields}})
+      
+      # Add validation method if block provided
+      \{% if block && block.class_name != "Nop" %}
+        class \{{node_name}} < \{{parent_type}}
+          def validate : Array(Hecate::Core::Diagnostic)
+            errors = [] of Hecate::Core::Diagnostic
+            \{{ block.body }}
+            errors
+          end
+          
+          # Helper methods for validation
+          private def error(message : String, span : Hecate::Core::Span = @span) : Hecate::Core::DiagnosticBuilder
+            Hecate::Core.error(message).primary(span, "here")
+          end
+          
+          private def warning(message : String, span : Hecate::Core::Span = @span) : Hecate::Core::DiagnosticBuilder
+            Hecate::Core.warning(message).primary(span, "here")
+          end
+          
+          private def hint(message : String, span : Hecate::Core::Span = @span) : Hecate::Core::DiagnosticBuilder
+            Hecate::Core.hint(message).primary(span, "here")
+          end
+        end
+      \{% end %}
     end
     
     # Finalize AST definition and generate visitor infrastructure and type predicates

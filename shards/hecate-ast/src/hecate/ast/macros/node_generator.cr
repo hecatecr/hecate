@@ -1,7 +1,7 @@
 module Hecate::AST
   module Macros
     # Generate a complete node class from DSL definition
-    macro generate_node_class(name, parent, fields, block = nil)
+    macro generate_node_class(name, parent, fields)
       class {{name}} < {{parent}}
         # Generate getters for each field
         {% for field in fields %}
@@ -169,27 +169,6 @@ module Hecate::AST
           io << ")"
         end
         
-        # Generate validation method if block provided
-        {% if block %}
-          def validate : Array(Hecate::Core::Diagnostic)
-            errors = [] of Hecate::Core::Diagnostic
-            {{ block.body }}
-            errors
-          end
-          
-          # Helper methods for validation
-          private def error(message : String, span : Hecate::Core::Span = @span) : Hecate::Core::Diagnostic
-            Hecate::Core.error(message).primary(span, "here")
-          end
-          
-          private def warning(message : String, span : Hecate::Core::Span = @span) : Hecate::Core::Diagnostic
-            Hecate::Core.warning(message).primary(span, "here")
-          end
-          
-          private def note(message : String, span : Hecate::Core::Span = @span) : Hecate::Core::Diagnostic
-            Hecate::Core.note(message).primary(span, "here")
-          end
-        {% end %}
       end
     end
   end

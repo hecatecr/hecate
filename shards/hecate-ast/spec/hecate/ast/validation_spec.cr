@@ -16,10 +16,10 @@ class ValidationTestAST
   # Node with validation
   node PositiveInt < Expr, value : Int32 do
     if value < 0
-      errors << error("Value must be positive", span)
+      errors << error("Value must be positive", span).build
     end
     if value > 1000000
-      errors << warning("Very large integer", span)
+      errors << warning("Very large integer", span).build
     end
   end
   
@@ -27,13 +27,13 @@ class ValidationTestAST
   node Add < Expr, left : Expr, right : Expr do
     # Test that we can access field values
     if left.is_a?(IntLit) && right.is_a?(IntLit)
-      left_val = left.value
-      right_val = right.value
+      left_val = left.as(IntLit).value
+      right_val = right.as(IntLit).value
       if left_val == 0
-        errors << note("Adding zero is redundant", left.span)
+        errors << hint("Adding zero is redundant", left.span).build
       end
       if right_val == 0
-        errors << note("Adding zero is redundant", right.span)
+        errors << hint("Adding zero is redundant", right.span).build
       end
     end
   end
@@ -47,13 +47,13 @@ describe "Hecate::AST Validation" do
   it "creates nodes without validation blocks normally" do
     node = ValidationTestAST::IntLit.new(make_span(), 42)
     node.value.should eq(42)
-    node.should_not respond_to(:validate)
+    node.responds_to?(:validate).should be_false
   end
   
   it "creates nodes with validation blocks and validate method" do
     node = ValidationTestAST::PositiveInt.new(make_span(), 42)
     node.value.should eq(42)
-    node.should respond_to(:validate)
+    node.responds_to?(:validate).should be_true
   end
   
   it "validates positive integers correctly" do
@@ -66,14 +66,14 @@ describe "Hecate::AST Validation" do
     invalid_node = ValidationTestAST::PositiveInt.new(make_span(), -5)
     errors = invalid_node.validate
     errors.size.should eq(1)
-    errors[0].level.should eq(Hecate::Core::DiagnosticLevel::Error)
+    errors[0].severity.should eq(Hecate::Core::Diagnostic::Severity::Error)
     errors[0].message.should contain("must be positive")
     
     # Large integer with warning
     large_node = ValidationTestAST::PositiveInt.new(make_span(), 2000000)
     errors = large_node.validate
     errors.size.should eq(1)
-    errors[0].level.should eq(Hecate::Core::DiagnosticLevel::Warning)
+    errors[0].severity.should eq(Hecate::Core::Diagnostic::Severity::Warning)
     errors[0].message.should contain("Very large")
   end
   
@@ -84,7 +84,7 @@ describe "Hecate::AST Validation" do
     
     errors = add_node.validate
     errors.size.should eq(1)
-    errors[0].level.should eq(Hecate::Core::DiagnosticLevel::Note)
+    errors[0].severity.should eq(Hecate::Core::Diagnostic::Severity::Hint)
     errors[0].message.should contain("Adding zero is redundant")
   end
   
@@ -94,8 +94,8 @@ describe "Hecate::AST Validation" do
     
     # The error should have proper span information
     error = errors[0]
-    error.spans.size.should eq(1)
-    error.spans[0].span.start_byte.should eq(0)
-    error.spans[0].span.end_byte.should eq(10)
+    error.labels.size.should eq(1)
+    error.labels[0].span.start_byte.should eq(0)
+    error.labels[0].span.end_byte.should eq(10)
   end
 end

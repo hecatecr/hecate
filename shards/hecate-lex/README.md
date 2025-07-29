@@ -1,19 +1,23 @@
 # hecate-lex
 
-A powerful lexical analysis library for Crystal that provides a macro-based DSL for defining lexers with comprehensive error handling and diagnostic support.
+Powerful lexical analysis library for Crystal with declarative DSL and rich diagnostics.
 
-## Features
+## Table of Contents
 
-- 🎯 **Declarative DSL** - Define tokens using readable macro syntax
-- 🏆 **Longest-Match-Wins** - Automatic conflict resolution using token priorities
-- 🔍 **Rich Diagnostics** - Integration with `hecate-core` for detailed error reporting
-- 🔄 **Error Recovery** - Continue lexing after encountering invalid input
-- 🚀 **High Performance** - Optimized for 100k+ tokens/second throughput
-- 🌍 **Unicode Support** - Full Unicode support with proper multi-byte handling
-- 🎨 **Dynamic Lexers** - Create lexers at runtime without predefined enums
-- 🔗 **Nesting Tracking** - Built-in support for tracking paired tokens
+- [Install](#install)
+- [Usage](#usage)
+  - [Basic Usage](#basic-usage)
+  - [Type-Safe Lexers](#type-safe-lexers)
+  - [Error Handling](#error-handling)
+- [API](#api)
+  - [DSL Methods](#dsl-methods)
+  - [Token Priorities](#token-priorities)
+  - [Nesting Tracker](#nesting-tracker)
+  - [Dynamic Lexers](#dynamic-lexers)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Installation
+## Install
 
 Add this to your application's `shard.yml`:
 
@@ -26,7 +30,7 @@ dependencies:
 
 Run `shards install` to install dependencies.
 
-## Quick Start
+## Usage
 
 ### Basic Usage
 
@@ -96,14 +100,33 @@ end
 
 # Define lexer with enum
 lexer = Hecate::Lex.define(CalcToken) do |ctx|
-  ctx.token CalcToken::WS, /\s+/, skip: true
-  ctx.token CalcToken::FLOAT, /\d+\.\d+/
-  ctx.token CalcToken::INTEGER, /\d+/
+  ctx.token :WS, /\s+/, skip: true
+  ctx.token :FLOAT, /\d+\.\d+/
+  ctx.token :INTEGER, /\d+/
   # ... rest of tokens
 end
 ```
 
-## API Reference
+### Error Handling
+
+Built-in error handlers for common cases:
+
+```crystal
+lexer = Hecate::Lex.define do |ctx|
+  # Basic token definition
+  ctx.token :STRING, /"([^"\\]|\\.)*"/
+  ctx.token :COMMENT, /\/\*.*?\*\//
+    
+  # Custom error handler
+  ctx.error :STRING do |input, pos|
+    Hecate.error("unterminated string literal")
+      .primary(span, "string starts here")
+      .help("add a closing quote")
+  end
+end
+```
+
+## API
 
 ### DSL Methods
 
@@ -124,7 +147,7 @@ end
 
 # Type-safe lexer with enum
 lexer = Hecate::Lex.define(TokenEnum) do |ctx|
-  ctx.token TokenEnum::KIND, /pattern/
+  ctx.token :KIND, /pattern/
 end
 ```
 
@@ -148,49 +171,31 @@ Default priorities:
 - Identifiers: 1
 - Others: 5
 
-### Error Handling
-
-Built-in error handlers for common cases:
-
-```crystal
-lexer = Hecate::Lex.define do
-  # Use built-in handlers
-  token :STRING, /"([^"\\]|\\.)*"/, 
-    error: Hecate::Lex::CommonErrors::UNTERMINATED_STRING
-  
-  token :COMMENT, /\/\*.*?\*\//, 
-    error: Hecate::Lex::CommonErrors::UNTERMINATED_COMMENT
-    
-  # Custom error handler
-  error :invalid_escape do |input, pos|
-    Hecate.error("invalid escape sequence")
-      .primary(span, "unknown escape character")
-      .help("valid escapes are: \\n, \\t, \\r, \\\\, \\\"")
-  end
-end
-```
-
-Available built-in handlers:
-- `UNTERMINATED_STRING`
-- `UNTERMINATED_COMMENT`
-- `INVALID_ESCAPE`
-- `INVALID_NUMBER`
-- `INVALID_CHARACTER`
-
 ### Nesting Tracker
 
 Track paired tokens for proper nesting validation:
 
 ```crystal
 # Use built-in bracket tracker
-tracker = Hecate::Lex.bracket_tracker
+tracker = Hecate::Lex::NestingTracker.bracket_tracker(
+  brace_open: :LBRACE,
+  brace_close: :RBRACE,
+  bracket_open: :LBRACKET,
+  bracket_close: :RBRACKET,
+  paren_open: :LPAREN,
+  paren_close: :RPAREN
+)
 
 # Or create custom tracker
-tracker = Hecate::Lex::NestingTracker.new do |t|
-  t.pair :LPAREN, :RPAREN
-  t.pair :LBRACE, :RBRACE
-  t.pair :BEGIN, :END
-end
+tracker = Hecate::Lex::NestingTracker.new(
+  open_tokens: [:LPAREN, :LBRACE, :BEGIN],
+  close_tokens: [:RPAREN, :RBRACE, :END],
+  pairs: {
+    :RPAREN => :LPAREN,
+    :RBRACE => :LBRACE,
+    :END => :BEGIN
+  }
+)
 
 # Process tokens
 tokens.each do |token|
@@ -204,45 +209,6 @@ unless tracker.balanced?
   error_msg = tracker.validation_error
   # Handle unmatched tokens
 end
-```
-
-### Scanner API
-
-Direct access to the scanner for advanced use cases:
-
-```crystal
-# Create scanner
-scanner = Hecate::Lex::Scanner.new(
-  rule_set, 
-  source_id, 
-  source_map
-)
-
-# Scan all tokens
-tokens, diagnostics = scanner.scan_all
-
-# Scanner automatically:
-# - Implements longest-match-wins
-# - Resolves conflicts by priority
-# - Recovers from errors
-# - Tracks source positions
-```
-
-### Token API
-
-Work with token objects:
-
-```crystal
-# Token structure
-token.kind        # Token type (Symbol or Enum value)
-token.span        # Source location (Hecate::Core::Span)
-token.value       # Optional semantic value
-
-# Get token text
-lexeme = token.lexeme(source_map)
-
-# Compare tokens
-token1 == token2  # Structural equality
 ```
 
 ### Dynamic Lexers
@@ -262,86 +228,7 @@ tokens.each do |token|
 end
 ```
 
-## Testing
-
-### Test Utilities
-
-Use built-in test helpers:
-
-```crystal
-require "hecate-core/test_utils"
-
-# Golden file testing for lexer output
-GoldenFile.test("lexer/json/simple", token_output)
-
-# Snapshot testing
-Snapshot.match("lexer_output", formatted_tokens)
-
-# Custom matchers
-tokens.should contain_token(:IDENTIFIER, "foo")
-diagnostics.should have_error("invalid character")
-```
-
-### Example Test
-
-```crystal
-describe "JSON Lexer" do
-  it "tokenizes objects" do
-    source = create_test_source('{"key": "value"}')
-    tokens, diagnostics = json_lexer.scan(source)
-    
-    token_kinds = tokens.map(&.kind)
-    token_kinds.should eq([
-      :LBRACE, :STRING, :COLON, :STRING, :RBRACE
-    ])
-    
-    diagnostics.should be_empty
-  end
-end
-```
-
-## Examples
-
-The `examples/` directory contains complete working examples:
-
-### JSON Lexer (`json_lexer.cr`)
-```crystal
-json_lexer = Hecate::Lex.define do
-  token :WS, /\s+/, skip: true
-  token :LBRACE, /\{/
-  token :RBRACE, /\}/
-  token :STRING, /"([^"\\]|\\.)*"/
-  # ... more tokens
-end
-```
-
-### Mini JavaScript Lexer (`mini_js_lexer.cr`)
-```crystal
-js_lexer = Hecate::Lex.define do
-  # Keywords (high priority)
-  token :FUNCTION, /function/, priority: 10
-  token :RETURN, /return/, priority: 10
-  
-  # Identifiers (low priority)  
-  token :IDENTIFIER, /[a-zA-Z_]\w*/, priority: 1
-  # ... more tokens
-end
-```
-
-### Dynamic Lexer Demo (`dynamic_lexer_demo.cr`)
-Shows runtime lexer creation and usage.
-
-## Performance
-
-Optimizations for high-throughput lexing:
-
-- **Pre-sorted rules** by priority and pattern length
-- **Direct regex matching** without anchored regex creation
-- **Pre-allocated token arrays** based on input size estimate
-- **Early exit conditions** in scanning loop
-- **Minimal allocations** in hot paths
-
-Benchmarks show 100k+ tokens/second on typical source code.
+For complete API documentation, see the [Crystal docs](https://hecatecr.github.io/hecate-lex).
 
 ## Contributing
 
@@ -349,14 +236,8 @@ This repository is a read-only mirror. All development happens in the [Hecate mo
 
 - **Issues**: Please file issues in the [main repository](https://github.com/hecatecr/hecate/issues)
 - **Pull Requests**: Submit PRs to the [monorepo](https://github.com/hecatecr/hecate)
-- **Development**: Clone the monorepo for local development
-
-Changes made here will be overwritten by the next automated release.
+- **Questions**: Open a discussion in the [monorepo discussions](https://github.com/hecatecr/hecate/discussions)
 
 ## License
 
-This library is released under the MIT License. See [LICENSE](LICENSE) for details.
-
-## Contributors
-
-- [Chris Watson](https://github.com/watzon) - creator and maintainer
+MIT © Chris Watson. See [LICENSE](LICENSE) for details.

@@ -411,3 +411,26 @@ When encountering Crystal internals or API questions, use these resources in ord
 - Pre-1.0: Expect breaking changes
 - Post-1.0: Semantic versioning guarantees
 - Deprecation cycle for major changes
+
+## Documentation Standards
+
+### README Format
+All README files in this project follow the [Standard Readme](https://github.com/RichardLitt/standard-readme) specification. This ensures consistency and completeness across all shards.
+
+**Required Sections (in order):**
+1. **Title** - Must match the shard name (e.g., `# hecate-core`)
+2. **Badges** (optional) - Build status, version, etc.
+3. **Short Description** - One-line description under 120 characters
+4. **Table of Contents** - Links to all sections
+5. **Install** - How to add the shard to a project
+6. **Usage** - Code examples showing common use cases
+7. **API** - Link to API documentation or brief overview
+8. **Contributing** - How to contribute, where to ask questions
+9. **License** - License type and owner
+
+**Additional Guidelines:**
+- Keep descriptions concise and focused
+- Include practical code examples in Usage section
+- Link to detailed API docs rather than documenting everything in README
+- Ensure all code examples are tested and working
+- Match the description in shard.yml

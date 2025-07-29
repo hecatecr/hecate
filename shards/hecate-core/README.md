@@ -1,17 +1,21 @@
 # hecate-core
 
-Core diagnostics and utilities for the Hecate language development toolkit.
+Core diagnostics and utilities for the Hecate language toolkit.
 
-## Features
+## Table of Contents
 
-- 🎯 **Beautiful diagnostics** - Rust-style error messages with multi-span support
-- 📍 **Source mapping** - Efficient tracking of source files and positions
-- 🔍 **Span tracking** - Precise location information for all language elements
-- 🎨 **Flexible rendering** - TTY and JSON output formats for different use cases
-- 🧪 **Testing utilities** - Snapshot testing and custom matchers for language tools
-- 🚀 **Zero dependencies** - Lightweight foundation for language tools
+- [Install](#install)
+- [Usage](#usage)
+- [API](#api)
+  - [Diagnostics](#diagnostics)
+  - [Source Management](#source-management)
+  - [Spans and Positions](#spans-and-positions)
+  - [Rendering](#rendering)
+  - [Testing Utilities](#testing-utilities)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Installation
+## Install
 
 Add the dependency to your `shard.yml`:
 
@@ -24,7 +28,7 @@ dependencies:
 
 Then run `shards install`
 
-## Quick Start
+## Usage
 
 ```crystal
 require "hecate-core"
@@ -48,7 +52,7 @@ renderer = Hecate::TTYRenderer.new
 renderer.emit(diag, source_map)
 ```
 
-## API Reference
+## API
 
 ### Diagnostics
 
@@ -67,13 +71,6 @@ diag = Hecate.error("type mismatch")
   .secondary(other_span, "found Int32")  # Secondary label (related location)
   .help("try converting with .to_s")     # Helpful suggestion
   .note("type inference happens here")   # Additional note
-
-# Query diagnostic properties
-diag.error?        # => true
-diag.severity      # => Severity::Error
-diag.message       # => "type mismatch"
-diag.label_count   # => 2
-diag.has_help?     # => true
 ```
 
 ### Source Management
@@ -87,32 +84,9 @@ source_map = Hecate::SourceMap.new
 file_id = source_map.add_file("path/to/file.cr", "source code")
 virtual_id = source_map.add_virtual("<repl>", "1 + 2")  # For REPL/generated code
 
-# Retrieve source files
-source_file = source_map.get(file_id)
-source_file = source_map.get_by_path("path/to/file.cr")
-
 # Convert spans to line/column positions
 position = source_map.span_to_position(span)
 puts "Error at #{position.display_line}:#{position.display_column}"
-
-# Query source map
-source_map.has_file?("path/to/file.cr")  # => true
-source_map.size                           # => 2
-source_map.each_source { |id, file| }     # Iterate all sources
-```
-
-Work with individual source files:
-
-```crystal
-source = source_map.get(file_id)
-
-# Convert between byte offsets and positions
-position = source.byte_to_position(10)      # Byte offset to line/column
-byte_offset = source.position_to_byte(position)  # Line/column to byte offset
-
-# Extract source lines
-line = source.line_at(1)                    # Get specific line (0-based)
-lines = source.line_range(0, 2)            # Get range of lines
 ```
 
 ### Spans and Positions
@@ -122,57 +96,30 @@ Track locations in source code:
 ```crystal
 # Create spans (immutable)
 span = Hecate::Span.new(file_id, start_byte, end_byte)
-span = Hecate::Span.new(file_id, start_byte, length: 10)  # Alternative
 
 # Span operations
 span.contains?(other_span)  # Check if span contains another
 span.overlaps?(other_span)  # Check if spans overlap
 merged = span.merge(other)  # Merge two spans
-
-# Span properties
-span.source_id   # File ID
-span.start_byte  # Start offset
-span.end_byte    # End offset
-span.length      # Byte length
-
-# Positions (0-based internally, 1-based for display)
-pos = Hecate::Position.new(line: 5, column: 10)
-pos.line           # => 5 (0-based)
-pos.column         # => 10 (0-based)
-pos.display_line   # => 6 (1-based for humans)
-pos.display_column # => 11 (1-based for humans)
 ```
 
 ### Rendering
 
 Output diagnostics in different formats:
 
-#### TTY Renderer (Terminal)
-
 ```crystal
-renderer = Hecate::TTYRenderer.new(output: STDOUT, width: 80)
-
-# Emit single diagnostic
+# TTY Renderer (Terminal)
+renderer = Hecate::Core::TTYRenderer.new(output: STDOUT, width: 80)
 renderer.emit(diagnostic, source_map)
 
-# Works with builders too
-renderer.emit(diagnostic_builder, source_map)
-```
-
-#### JSON Renderer (LSP-compatible)
-
-```crystal
-# Emit single diagnostic
-Hecate::Core::Renderer::JSON.emit(diagnostic, io)
-json_string = Hecate::Core::Renderer::JSON.emit_string(diagnostic)
+# JSON Renderer (LSP-compatible)
+json_renderer = Hecate::Core::Renderer::JSON.new(source_map)
+json_string = json_renderer.emit_string(diagnostic)
 
 # Batch operations
-Hecate::Core::Renderer::JSON.emit_batch(diagnostics, io)
-Hecate::Core::Renderer::JSON.emit_by_severity(diagnostics, :error, io)
-Hecate::Core::Renderer::JSON.emit_by_source(diagnostics, io)
-
-# LSP format for language servers
-Hecate::Core::Renderer::JSON.emit_lsp_publish_diagnostics(diagnostics, io)
+json_renderer.emit_batch(diagnostics, io)
+json_renderer.emit_by_severity(diagnostics, :error, io)
+json_renderer.emit_lsp_publish_diagnostics(diagnostics, io)
 ```
 
 ### Testing Utilities
@@ -184,41 +131,15 @@ require "hecate-core/test_utils"
 
 # Snapshot testing
 Snapshot.match("test_name", actual_output)
-Snapshot.match_formatted("test_name", actual)  # Normalizes whitespace
-Snapshot.match_yaml("test_name", data)         # YAML format
-Snapshot.match_json("test_name", data)         # JSON format
 
 # Golden file testing
 GoldenFile.test("lexer/tokens", actual_tokens)
 
 # Test generators
-identifier = Generators.identifier(10)          # Random valid identifier
-code = Generators.source_snippet(5)            # Sample code snippet
-span = Generators.span(file_id, max_offset)   # Random valid span
-
-# Custom matchers for specs
-diagnostic.should have_error("message")
-diagnostic.should have_warning("message").at(span)
-span.should match_span(start: 10, length: 5)
-
-# Helper methods
-source_map = create_test_source("code")
-span = span(0, 10)  # Quick span creation
-pos = pos(5, 10)    # Quick position creation
+identifier = Generators.identifier(10)  # Random valid identifier
 ```
 
-## Development
-
-```bash
-# Run tests
-crystal spec
-
-# Build
-crystal build src/hecate-core.cr
-
-# Generate docs
-crystal docs
-```
+For complete API documentation, see the [Crystal docs](https://hecatecr.github.io/hecate-core).
 
 ## Contributing
 
@@ -226,10 +147,8 @@ This repository is a read-only mirror. All development happens in the [Hecate mo
 
 - **Issues**: Please file issues in the [main repository](https://github.com/hecatecr/hecate/issues)
 - **Pull Requests**: Submit PRs to the [monorepo](https://github.com/hecatecr/hecate)
-- **Development**: Clone the monorepo for local development
-
-Changes made here will be overwritten by the next automated release.
+- **Questions**: Open a discussion in the [monorepo discussions](https://github.com/hecatecr/hecate/discussions)
 
 ## License
 
-MIT - see [LICENSE](LICENSE) for details
+MIT © Chris Watson. See [LICENSE](LICENSE) for details.

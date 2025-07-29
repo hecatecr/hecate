@@ -2,42 +2,25 @@
   <img src="https://github.com/hecatecr/hecate/raw/refs/heads/main/assets/logo.png" width="300" />
 </p>
 
+# hecate
+
 [![CI](https://github.com/hecatecr/hecate/workflows/CI/badge.svg)](https://github.com/hecatecr/hecate/actions)
 [![Crystal Version](https://img.shields.io/badge/crystal-latest-brightgreen)](https://crystal-lang.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A batteries-included language development toolkit for Crystal. Build your own programming languages and DSLs with first-class diagnostics, incremental parsing, and IDE support.
+A batteries-included language development toolkit for Crystal.
 
-## Features
+## Table of Contents
 
-- 🎯 **First-class diagnostics** - Beautiful, Rust-style error messages with multi-span support
-- ⚡ **Rapid prototyping** - Generate lexers, parsers, and ASTs in minutes with declarative DSLs
-- 🔧 **Modular architecture** - Pick and choose components for your language
-- 📝 **IDE-ready** - LSP server support and incremental parsing (coming soon)
-- 🚀 **Multiple backends** - Transpile to Crystal, LLVM, or WASM (roadmap)
+- [Install](#install)
+- [Usage](#usage)
+  - [Quick Example](#quick-example)
+  - [Available Shards](#available-shards)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Project Structure
-
-Hecate is organized as a monorepo with independently versioned shards:
-
-```
-hecate/
-├── shards/
-│   ├── hecate-core/    # Diagnostics, source mapping, and utilities
-│   ├── hecate-ast/     # AST node definitions and visitors
-│   ├── hecate-lex/     # Lexer generation and tokenization
-│   ├── hecate-parse/   # Parser combinators and Tree-sitter bridge
-│   ├── hecate-sem/     # Semantic analysis and type checking
-│   ├── hecate-ir/      # Intermediate representation
-│   ├── hecate-codegen/ # Code generation backends
-│   └── hecate-cli/     # Command-line interface
-├── docs/               # Documentation
-└── tools/              # Build and release tooling
-```
-
-## Quick Start
-
-### Using individual shards
+## Install
 
 Add the shards you need to your `shard.yml`:
 
@@ -49,36 +32,65 @@ dependencies:
   hecate-lex:
     github: hecatecr/hecate-lex
     version: ~> 0.1.0
+  hecate-ast:
+    github: hecatecr/hecate-ast
+    version: ~> 0.1.0
 ```
 
-### Example: Building a simple expression language
+Run `shards install`.
+
+## Usage
+
+### Quick Example
+
+Build a simple expression lexer:
 
 ```crystal
 require "hecate-core"
 require "hecate-lex"
 
 # Define your lexer
-MyLexer = Hecate::Lex.define do
-  token :WS, /\s+/, skip: true
-  token :Int, /\d+/
-  token :Plus, /\+/
-  token :Minus, /-/
-  token :EOF
+lexer = Hecate::Lex.define do |ctx|
+  ctx.token :WS, /\s+/, skip: true
+  ctx.token :INT, /\d+/
+  ctx.token :PLUS, /\+/
+  ctx.token :MINUS, /-/
+  ctx.token :MULTIPLY, /\*/
+  ctx.token :DIVIDE, /\//
 end
 
 # Create a source file
-source_map = Hecate::SourceMap.new
-file_id = source_map.add_file("example.expr", "42 + 13")
+source_map = Hecate::Core::SourceMap.new
+source_id = source_map.add_file("example.expr", "42 + 13 * 2")
+source_file = source_map.get(source_id).not_nil!
 
 # Lex the input
-tokens, diagnostics = MyLexer.lex(file_id, source_map)
+tokens, diagnostics = lexer.scan(source_file)
 
 # Handle any errors
 if diagnostics.any?
-  renderer = Hecate::TTYRenderer.new
+  renderer = Hecate::Core::TTYRenderer.new
   diagnostics.each { |diag| renderer.emit(diag, source_map) }
+else
+  # Process tokens
+  tokens.each do |token|
+    puts "#{token.kind}: '#{token.lexeme(source_file)}'"
+  end
 end
 ```
+
+### Available Shards
+
+Hecate is organized as a monorepo with independently versioned shards:
+
+- **[hecate-core](shards/hecate-core)** - Diagnostics, source mapping, and utilities
+- **[hecate-ast](shards/hecate-ast)** - AST node definitions and visitor pattern
+- **[hecate-lex](shards/hecate-lex)** - Lexer generation with declarative DSL
+- **[hecate-parse](shards/hecate-parse)** - Parser combinators and Tree-sitter bridge (coming soon)
+- **[hecate-sem](shards/hecate-sem)** - Semantic analysis and type checking (coming soon)
+- **[hecate-ir](shards/hecate-ir)** - Intermediate representation (coming soon)
+- **[hecate-codegen](shards/hecate-codegen)** - Code generation backends (coming soon)
+- **[hecate-cli](shards/hecate-cli)** - Command-line interface (coming soon)
 
 ## Development
 
@@ -86,6 +98,7 @@ end
 
 - Crystal 1.17.0 or higher
 - Git
+- Just (optional, for convenience commands)
 
 ### Setup
 
@@ -97,49 +110,42 @@ end
 
 2. Install dependencies:
    ```bash
-   shards install
+   just install
+   # or manually: SHARDS_OVERRIDE=shard.dev.yml shards install
    ```
 
-3. Run tests for a specific shard:
+3. Run all tests:
    ```bash
-   cd shards/hecate-core
-   crystal spec
+   just test
    ```
 
-### Running all tests
+4. Run tests for a specific shard:
+   ```bash
+   just test-shard core
+   just test-shard lex
+   just test-shard ast
+   ```
 
-```bash
-find shards -name "spec" -type d | while read dir; do
-  echo "Testing $(dirname $dir)..."
-  (cd $(dirname $dir) && crystal spec) || exit 1
-done
-```
+### Development Workflow
 
-## Roadmap
+The monorepo uses a dual shard configuration:
+- **Production shards** (`shards/*/shard.yml`) - Point to GitHub repositories
+- **Development shards** (`shard.dev.yml`) - Use local path dependencies
 
-- [x] Core diagnostics system
-- [ ] AST framework
-- [x] Basic lexer generation
-- [ ] Parser combinators
-- [ ] Semantic analysis
-- [ ] Crystal transpiler
-- [ ] LSP server
-- [ ] LLVM backend
-- [ ] WASM backend
-
-See the [full roadmap](ROADMAP.md) for more details.
+All development commands should be run from the repository root using the justfile or with `SHARDS_OVERRIDE=shard.dev.yml`.
 
 ## Contributing
 
-Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) before submitting PRs.
+Contributions are welcome! Please follow these guidelines:
+
+1. **Issues and PRs** should be filed against this monorepo, not individual shard repositories
+2. **All development** happens in the monorepo - individual shard repos are read-only mirrors
+3. **Tests are required** - Write tests before implementation (TDD approach)
+4. **Run the full test suite** before committing to catch cross-shard compilation errors
+5. **Follow Crystal conventions** and the patterns established in the codebase
+
+See our [Contributing Guide](CONTRIBUTING.md) for detailed information.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
-
-## Acknowledgments
-
-Inspired by:
-- Rust's `codespan-reporting` for beautiful diagnostics
-- `logos` for fast lexer generation
-- The Crystal compiler's excellent architecture
+MIT © Chris Watson. See [LICENSE](LICENSE) for details.

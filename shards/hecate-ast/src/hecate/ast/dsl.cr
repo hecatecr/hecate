@@ -2,7 +2,6 @@ require "./macros/node_generator"
 require "./macros/struct_node_generator"
 require "./macros/optimized_node_generator"
 require "./macros/pooled_node_generator"
-require "./macros/visitor_generator"
 require "./macros/type_predicates"
 
 # Define macros that will be available when Hecate::AST is included
@@ -12,7 +11,7 @@ module Hecate::AST
     macro abstract_node(type_name)
       abstract class \{{type_name.id}} < ::Hecate::AST::Node
       end
-      
+
     end
 
     # Define a memory-optimized struct node for leaf nodes
@@ -24,46 +23,48 @@ module Hecate::AST
     macro struct_node(signature, *fields, &block)
       \{% # Parse the signature (e.g., "Child < Parent" or just "Child")
 
-if signature.is_a?(Call) && signature.name == :<
-  node_name = signature.receiver
-  parent_type = signature.args[0]
-else
-  node_name = signature
-  parent_type = "::Hecate::AST::Node".id
-end
-      %}
-      
+ if signature.is_a?(Call) && signature.name == :<
+   node_name = signature.receiver
+   parent_type = signature.args[0]
+ else
+   node_name = signature
+   parent_type = "::Hecate::AST::Node".id
+ end %}
+
       # Generate the struct node with fields parsing
       \{% # Parse fields into structured format (same as regular nodes)
 
-parsed_fields = [] of NamedTuple
+ parsed_fields = [] of NamedTuple
 
-fields.each do |field|
-  if field.is_a?(TypeDeclaration)
-    field_name = field.var.id.stringify
-    field_type = field.type.id.stringify
-    optional = field_type.ends_with?("?") || field_type.includes?(" | ::Nil") || field_type.includes?(" | Nil")
+ fields.each do |field|
+   if field.is_a?(TypeDeclaration)
+     field_name = field.var.id.stringify
+     field_type = field.type.id.stringify
+     optional = field_type.ends_with?("?") || field_type.includes?(" | ::Nil") || field_type.includes?(" | Nil")
 
-    # Validate field name
-    reserved_names = ["span", "children", "accept", "clone"]
-    if reserved_names.includes?(field_name)
-      raise "Field name '#{field_name}' is reserved and cannot be used"
-    end
+     # Validate field name
+     reserved_names = ["span", "children", "accept", "clone"]
+     if reserved_names.includes?(field_name)
+       raise "Field name '#{field_name}' is reserved and cannot be used"
+     end
 
-    parsed_fields << {
-      name:     field.var,
-      type:     field.type,
-      optional: optional,
-    }
-  else
-    raise "Invalid field definition: #{field}. Expected format: name : Type"
-  end
-end
-      %}
-      
+     parsed_fields << {
+       name:     field.var,
+       type:     field.type,
+       optional: optional,
+     }
+   else
+     raise "Invalid field definition: #{field}. Expected format: name : Type"
+   end
+ end %}
+
       # Generate the struct node implementation
-      ::Hecate::AST::Macros.generate_struct_node(\{{node_name}}, \{{parent_type}}, \{{parsed_fields}})
-      
+      \{% if parsed_fields.empty? %}
+        ::Hecate::AST::Macros.generate_struct_node(\{{node_name}}, \{{parent_type}}, [] of NamedTuple)
+      \{% else %}
+        ::Hecate::AST::Macros.generate_struct_node(\{{node_name}}, \{{parent_type}}, \{{parsed_fields}})
+      \{% end %}
+
       # Add validation method if block provided (to wrapper class)
       \{% if block && block.class_name != "Nop" %}
         class \{{node_name}}Wrapper < \{{parent_type}}
@@ -72,16 +73,16 @@ end
             \{{ block.body }}
             errors
           end
-          
+
           # Helper methods for validation
           private def error(message : String, span : Hecate::Core::Span = @inner.span) : Hecate::Core::DiagnosticBuilder
             Hecate::Core.error(message).primary(span, "here")
           end
-          
+
           private def warning(message : String, span : Hecate::Core::Span = @inner.span) : Hecate::Core::DiagnosticBuilder
             Hecate::Core.warning(message).primary(span, "here")
           end
-          
+
           private def hint(message : String, span : Hecate::Core::Span = @inner.span) : Hecate::Core::DiagnosticBuilder
             Hecate::Core.hint(message).primary(span, "here")
           end
@@ -98,46 +99,48 @@ end
     macro optimized_node(signature, *fields, &block)
       \{% # Parse the signature (e.g., "Child < Parent" or just "Child")
 
-if signature.is_a?(Call) && signature.name == :<
-  node_name = signature.receiver
-  parent_type = signature.args[0]
-else
-  node_name = signature
-  parent_type = "::Hecate::AST::Node".id
-end
-      %}
-      
+ if signature.is_a?(Call) && signature.name == :<
+   node_name = signature.receiver
+   parent_type = signature.args[0]
+ else
+   node_name = signature
+   parent_type = "::Hecate::AST::Node".id
+ end %}
+
       # Generate the optimized node with fields parsing
       \{% # Parse fields into structured format (same as regular nodes)
 
-parsed_fields = [] of NamedTuple
+ parsed_fields = [] of NamedTuple
 
-fields.each do |field|
-  if field.is_a?(TypeDeclaration)
-    field_name = field.var.id.stringify
-    field_type = field.type.id.stringify
-    optional = field_type.ends_with?("?") || field_type.includes?(" | ::Nil") || field_type.includes?(" | Nil")
+ fields.each do |field|
+   if field.is_a?(TypeDeclaration)
+     field_name = field.var.id.stringify
+     field_type = field.type.id.stringify
+     optional = field_type.ends_with?("?") || field_type.includes?(" | ::Nil") || field_type.includes?(" | Nil")
 
-    # Validate field name
-    reserved_names = ["span", "children", "accept", "clone"]
-    if reserved_names.includes?(field_name)
-      raise "Field name '#{field_name}' is reserved and cannot be used"
-    end
+     # Validate field name
+     reserved_names = ["span", "children", "accept", "clone"]
+     if reserved_names.includes?(field_name)
+       raise "Field name '#{field_name}' is reserved and cannot be used"
+     end
 
-    parsed_fields << {
-      name:     field.var,
-      type:     field.type,
-      optional: optional,
-    }
-  else
-    raise "Invalid field definition: #{field}. Expected format: name : Type"
-  end
-end
-      %}
-      
+     parsed_fields << {
+       name:     field.var,
+       type:     field.type,
+       optional: optional,
+     }
+   else
+     raise "Invalid field definition: #{field}. Expected format: name : Type"
+   end
+ end %}
+
       # Generate the optimized node class
-      ::Hecate::AST::Macros.generate_optimized_node_class(\{{node_name}}, \{{parent_type}}, \{{parsed_fields}})
-      
+      \{% if parsed_fields.empty? %}
+        ::Hecate::AST::Macros.generate_optimized_node_class(\{{node_name}}, \{{parent_type}}, [] of NamedTuple)
+      \{% else %}
+        ::Hecate::AST::Macros.generate_optimized_node_class(\{{node_name}}, \{{parent_type}}, \{{parsed_fields}})
+      \{% end %}
+
       # Add validation method if block provided
       \{% if block && block.class_name != "Nop" %}
         class \{{node_name}} < \{{parent_type}}
@@ -146,16 +149,16 @@ end
             \{{ block.body }}
             errors
           end
-          
+
           # Helper methods for validation
           private def error(message : String, span : Hecate::Core::Span = @span) : Hecate::Core::DiagnosticBuilder
             Hecate::Core.error(message).primary(span, "here")
           end
-          
+
           private def warning(message : String, span : Hecate::Core::Span = @span) : Hecate::Core::DiagnosticBuilder
             Hecate::Core.warning(message).primary(span, "here")
           end
-          
+
           private def hint(message : String, span : Hecate::Core::Span = @span) : Hecate::Core::DiagnosticBuilder
             Hecate::Core.hint(message).primary(span, "here")
           end
@@ -173,46 +176,48 @@ end
     macro pooled_node(signature, *fields, &block)
       \{% # Parse the signature (e.g., "Child < Parent" or just "Child")
 
-if signature.is_a?(Call) && signature.name == :<
-  node_name = signature.receiver
-  parent_type = signature.args[0]
-else
-  node_name = signature
-  parent_type = "::Hecate::AST::Node".id
-end
-      %}
-      
+ if signature.is_a?(Call) && signature.name == :<
+   node_name = signature.receiver
+   parent_type = signature.args[0]
+ else
+   node_name = signature
+   parent_type = "::Hecate::AST::Node".id
+ end %}
+
       # Generate the pooled node with fields parsing
       \{% # Parse fields into structured format (same as regular nodes)
 
-parsed_fields = [] of NamedTuple
+ parsed_fields = [] of NamedTuple
 
-fields.each do |field|
-  if field.is_a?(TypeDeclaration)
-    field_name = field.var.id.stringify
-    field_type = field.type.id.stringify
-    optional = field_type.ends_with?("?") || field_type.includes?(" | ::Nil") || field_type.includes?(" | Nil")
+ fields.each do |field|
+   if field.is_a?(TypeDeclaration)
+     field_name = field.var.id.stringify
+     field_type = field.type.id.stringify
+     optional = field_type.ends_with?("?") || field_type.includes?(" | ::Nil") || field_type.includes?(" | Nil")
 
-    # Validate field name
-    reserved_names = ["span", "children", "accept", "clone"]
-    if reserved_names.includes?(field_name)
-      raise "Field name '#{field_name}' is reserved and cannot be used"
-    end
+     # Validate field name
+     reserved_names = ["span", "children", "accept", "clone"]
+     if reserved_names.includes?(field_name)
+       raise "Field name '#{field_name}' is reserved and cannot be used"
+     end
 
-    parsed_fields << {
-      name:     field.var,
-      type:     field.type,
-      optional: optional,
-    }
-  else
-    raise "Invalid field definition: #{field}. Expected format: name : Type"
-  end
-end
-      %}
-      
+     parsed_fields << {
+       name:     field.var,
+       type:     field.type,
+       optional: optional,
+     }
+   else
+     raise "Invalid field definition: #{field}. Expected format: name : Type"
+   end
+ end %}
+
       # Generate the pooled node class
-      ::Hecate::AST::Macros.generate_pooled_node_class(\{{node_name}}, \{{parent_type}}, \{{parsed_fields}})
-      
+      \{% if parsed_fields.empty? %}
+        ::Hecate::AST::Macros.generate_pooled_node_class(\{{node_name}}, \{{parent_type}}, [] of NamedTuple)
+      \{% else %}
+        ::Hecate::AST::Macros.generate_pooled_node_class(\{{node_name}}, \{{parent_type}}, \{{parsed_fields}})
+      \{% end %}
+
       # Add validation method if block provided
       \{% if block && block.class_name != "Nop" %}
         class \{{node_name}} < \{{parent_type}}
@@ -221,16 +226,16 @@ end
             \{{ block.body }}
             errors
           end
-          
+
           # Helper methods for validation
           private def error(message : String, span : Hecate::Core::Span = @span) : Hecate::Core::DiagnosticBuilder
             Hecate::Core.error(message).primary(span, "here")
           end
-          
+
           private def warning(message : String, span : Hecate::Core::Span = @span) : Hecate::Core::DiagnosticBuilder
             Hecate::Core.warning(message).primary(span, "here")
           end
-          
+
           private def hint(message : String, span : Hecate::Core::Span = @span) : Hecate::Core::DiagnosticBuilder
             Hecate::Core.hint(message).primary(span, "here")
           end
@@ -251,48 +256,50 @@ end
     macro node(signature, *fields, &block)
       \{% # Parse the signature (e.g., "Child < Parent" or just "Child")
 
-if signature.is_a?(Call) && signature.name == :<
-  node_name = signature.receiver
-  parent_type = signature.args[0]
-else
-  node_name = signature
-  parent_type = "::Hecate::AST::Node".id
-end
-      %}
-      
+ if signature.is_a?(Call) && signature.name == :<
+   node_name = signature.receiver
+   parent_type = signature.args[0]
+ else
+   node_name = signature
+   parent_type = "::Hecate::AST::Node".id
+ end %}
+
       # Generate the node class with fields parsing restored
       \{% # Parse fields into structured format
 
-parsed_fields = [] of NamedTuple
+ parsed_fields = [] of NamedTuple
 
-fields.each do |field|
-  if field.is_a?(TypeDeclaration)
-    field_name = field.var.id.stringify
-    field_type = field.type.id.stringify
-    # Detect optional fields: either ends with ? or is a union with Nil
-    optional = field_type.ends_with?("?") || field_type.includes?(" | ::Nil") || field_type.includes?(" | Nil")
+ fields.each do |field|
+   if field.is_a?(TypeDeclaration)
+     field_name = field.var.id.stringify
+     field_type = field.type.id.stringify
+     # Detect optional fields: either ends with ? or is a union with Nil
+     optional = field_type.ends_with?("?") || field_type.includes?(" | ::Nil") || field_type.includes?(" | Nil")
 
-    # Validate field name
-    reserved_names = ["span", "children", "accept", "clone"]
-    if reserved_names.includes?(field_name)
-      raise "Field name '#{field_name}' is reserved and cannot be used"
-    end
+     # Validate field name
+     reserved_names = ["span", "children", "accept", "clone"]
+     if reserved_names.includes?(field_name)
+       raise "Field name '#{field_name}' is reserved and cannot be used"
+     end
 
-    parsed_fields << {
-      name:     field.var,
-      type:     field.type,
-      optional: optional,
-    }
-  else
-    raise "Invalid field definition: #{field}. Expected format: name : Type"
-  end
-end
-      %}
-      
-      
+     parsed_fields << {
+       name:     field.var,
+       type:     field.type,
+       optional: optional,
+     }
+   else
+     raise "Invalid field definition: #{field}. Expected format: name : Type"
+   end
+ end %}
+
+
       # Generate the node class directly here to preserve block context
-      ::Hecate::AST::Macros.generate_node_class(\{{node_name}}, \{{parent_type}}, \{{parsed_fields}})
-      
+      \{% if parsed_fields.empty? %}
+        ::Hecate::AST::Macros.generate_node_class(\{{node_name}}, \{{parent_type}}, [] of NamedTuple)
+      \{% else %}
+        ::Hecate::AST::Macros.generate_node_class(\{{node_name}}, \{{parent_type}}, \{{parsed_fields}})
+      \{% end %}
+
       # Add validation method if block provided
       \{% if block && block.class_name != "Nop" %}
         class \{{node_name}} < \{{parent_type}}
@@ -301,16 +308,16 @@ end
             \{{ block.body }}
             errors
           end
-          
+
           # Helper methods for validation
           private def error(message : String, span : Hecate::Core::Span = @span) : Hecate::Core::DiagnosticBuilder
             Hecate::Core.error(message).primary(span, "here")
           end
-          
+
           private def warning(message : String, span : Hecate::Core::Span = @span) : Hecate::Core::DiagnosticBuilder
             Hecate::Core.warning(message).primary(span, "here")
           end
-          
+
           private def hint(message : String, span : Hecate::Core::Span = @span) : Hecate::Core::DiagnosticBuilder
             Hecate::Core.hint(message).primary(span, "here")
           end
@@ -325,37 +332,37 @@ end
       \{% unless @type.has_constant?("Builder") %}
         module Builder
           extend self
-          
+
           # Default span for builder-constructed nodes
           DEFAULT_SPAN = ::Hecate::Core::Span.new(0_u32, 0, 0)
-          
+
           # Block-based DSL construction
           def build(&block)
             with self yield
           end
-          
+
           # Calculate a span that encompasses all child nodes
           def span_for(*nodes : ::Hecate::AST::Node) : ::Hecate::Core::Span
             return DEFAULT_SPAN if nodes.empty?
-            
+
             source_id = nodes.first.span.source_id
             start_byte = nodes.map(&.span.start_byte).min
             end_byte = nodes.map(&.span.end_byte).max
-            
+
             ::Hecate::Core::Span.new(source_id, start_byte, end_byte)
           end
-          
+
           # Helper for optional values with automatic type inference
           def optional(value : T) : T? forall T
             value
           end
-          
+
           def optional(value : Nil) : Nil
             nil
           end
         end
       \{% end %}
-      
+
       module Builder
         # Builder method for \{{node_type}} with explicit span
         def \{{node_type.id.underscore}}(
@@ -375,7 +382,7 @@ end
             \{% end %}
           )
         end
-        
+
       end
     end
 
@@ -385,39 +392,39 @@ end
       \{% unless @type.has_constant?("Builder") %}
         module Builder
           extend self
-          
+
           # Default span for builder-constructed nodes
           DEFAULT_SPAN = ::Hecate::Core::Span.new(0_u32, 0, 0)
-          
+
           # Block-based DSL construction
           def build(&block)
             with self yield
           end
         end
       \{% end %}
-      
+
       module Builder
         # Convenience method for creating lists of nodes
         def list(*nodes : ::Hecate::AST::Node)
           nodes.to_a
         end
-        
+
         # Convenience method for optional nodes
         def some(node : ::Hecate::AST::Node) : ::Hecate::AST::Node?
           node
         end
-        
+
         def none : ::Hecate::AST::Node?
           nil
         end
-        
+
         # Helper for building block-like structures
         def block(*statements : ::Hecate::AST::Node)
           # This would be used with a Block node type if defined
           # block(stmt1, stmt2, stmt3)
           statements.to_a
         end
-        
+
         # Helper for binary operations with automatic span calculation
         def binary(op : String, left : ::Hecate::AST::Node, right : ::Hecate::AST::Node, span : ::Hecate::Core::Span? = nil)
           final_span = span || span_for(left, right)
@@ -435,13 +442,13 @@ end
         \{% for node_type in node_types %}
           abstract def visit_\{{node_type.id.underscore}}(node : \{{node_type}}) : T
         \{% end %}
-        
+
         # Generic visit method that delegates to node's accept method
         def visit(node : ::Hecate::AST::Node) : T
           node.accept(self)
         end
       end
-      
+
       # Generate Transformer base class for AST transformations
       abstract class Transformer < Visitor(::Hecate::AST::Node)
         \{% for node_type in node_types %}
@@ -452,8 +459,8 @@ end
           end
         \{% end %}
       end
-      
-      
+
+
       # Generate type predicate methods for pattern matching and type discrimination
       ::Hecate::AST::Macros.generate_type_predicates(\{{node_types.splat}})
     end

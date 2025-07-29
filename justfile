@@ -141,6 +141,7 @@ add-remotes:
     @echo "➕ Adding shard remotes..."
     @git remote add core-remote git@github.com:hecatecr/hecate-core.git || true
     @git remote add lex-remote git@github.com:hecatecr/hecate-lex.git || true
+    @git remote add ast-remote git@github.com:hecatecr/hecate-ast.git || true
     @echo "✅ Remotes added"
 
 # Push a specific shard to its repository
@@ -154,6 +155,7 @@ push-all branch="main":
     @echo "🚀 Pushing all shards to {{branch}}..."
     @just push-shard core {{branch}}
     @just push-shard lex {{branch}}
+    @just push-shard ast {{branch}}
     @echo "✅ All shards pushed successfully"
 
 # Push all changes (monorepo + shards)
@@ -181,6 +183,7 @@ push-tag tag:
     @echo "🏷️  Pushing tag {{tag}} to all shards..."
     @git subtree push --prefix=shards/hecate-core core-remote refs/tags/{{tag}}
     @git subtree push --prefix=shards/hecate-lex lex-remote refs/tags/{{tag}}
+    @git subtree push --prefix=shards/hecate-ast ast-remote refs/tags/{{tag}}
     @echo "✅ Tag {{tag}} pushed to all shards"
 
 # Create and push a release

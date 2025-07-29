@@ -15,7 +15,7 @@ The Hecate AST framework provides comprehensive pattern matching and type discri
 For each node type you define, the framework automatically generates predicate methods:
 
 ```crystal
-# Define your AST
+# Define your AST - must include the module first
 module MyAST
   include Hecate::AST
   
@@ -23,10 +23,12 @@ module MyAST
   node IntLit < Expr, value : Int32
   node BinaryOp < Expr, left : Expr, right : Expr, operator : String
   
+  # This is required to generate visitors and type predicates
   finalize_ast IntLit, BinaryOp
 end
 
 # Use predicate methods
+span = Hecate::Core::Span.new(0_u32, 0, 5)
 node = MyAST::IntLit.new(span, 42)
 node.int_lit?     # => true
 node.binary_op?   # => false
@@ -37,10 +39,12 @@ node.binary_op?   # => false
 For each node type `NodeName`, these methods are generated:
 
 - `node_name?` on the specific node class (returns `true`)
-- `node_name?` on the base `Node` class (returns `false` by default)
+- `node_name?` on the base `::Hecate::AST::Node` class (returns `false` by default, overridden in subclasses)
 - `node_type_symbol` returns the node type as a symbol (`:node_name`)
-- `expression?` returns `true` if the node appears to be an expression
-- `statement?` returns `true` if the node appears to be a statement
+- `expression?` returns `true` if the node appears to be an expression (based on class name heuristics)
+- `statement?` returns `true` if the node appears to be a statement (based on class name heuristics)
+
+**Note:** The `expression?` method returns true for classes with names containing "Expr", ending with "Lit", or containing "Op" or "Call". The `statement?` method returns true for classes with names containing "Stmt", "Decl", "Block", "If", "While", "For", or "Return".
 
 ## Crystal case/when Pattern Matching
 
@@ -135,7 +139,7 @@ The framework provides tools to ensure your pattern matches handle all possible 
 ### Check Coverage
 
 ```crystal
-# Get all possible node types
+# Get all possible node types (excludes abstract types)
 all_types = Hecate::AST::Node.all_node_types
 # => [:int_lit, :binary_op, :var_decl, ...]
 
@@ -148,6 +152,8 @@ is_complete = Hecate::AST::Node.exhaustive_match?(handled_types)
 missing = Hecate::AST::Node.missing_from_match(handled_types)
 # => [:var_decl, :block, ...]
 ```
+
+**Note:** The `all_node_types` method returns only concrete node types defined with `node`, not abstract types defined with `abstract_node`.
 
 ### Validate Exhaustiveness
 
@@ -283,7 +289,66 @@ end
 
 ## Complete Example
 
-See `examples/pattern_matching.cr` for a comprehensive example that demonstrates all these features in action.
+Here's a complete example showing proper module structure and all pattern matching features:
+
+```crystal
+require "hecate-ast"
+require "hecate-core"
+
+# Define a simple expression language AST
+module ExampleAST
+  include Hecate::AST
+
+  # Abstract base types
+  abstract_node Expr
+  abstract_node Stmt
+
+  # Expression nodes
+  node IntLit < Expr, value : Int32
+  node BinaryOp < Expr, left : Expr, right : Expr, operator : String
+  
+  # Statement nodes  
+  node VarDecl < Stmt, name : String, value : Expr?
+  node Block < Stmt, statements : Array(Stmt)
+
+  # Finalize AST to generate visitors and type predicates
+  finalize_ast IntLit, BinaryOp, VarDecl, Block
+end
+
+# Create some example nodes
+span = Hecate::Core::Span.new(0_u32, 0, 10)
+int_lit = ExampleAST::IntLit.new(span, 42)
+binary_op = ExampleAST::BinaryOp.new(span, int_lit, int_lit, "+")
+
+# Use type predicates
+puts int_lit.int_lit?     # => true
+puts int_lit.binary_op?   # => false
+puts int_lit.expression?  # => true (name contains "Lit")
+puts int_lit.statement?   # => false
+
+# Pattern matching with case/when
+result = case binary_op
+         when ExampleAST::IntLit
+           "Integer: #{binary_op.value}"
+         when ExampleAST::BinaryOp
+           "Binary operation: #{binary_op.operator}"
+         when ExampleAST::VarDecl
+           "Variable: #{binary_op.name}"
+         else
+           "Unknown"
+         end
+puts result  # => "Binary operation: +"
+
+# Exhaustive pattern matching
+all_types = Hecate::AST::Node.all_node_types
+puts all_types  # => [:int_lit, :binary_op, :var_decl, :block]
+
+handled = [:int_lit, :binary_op]
+missing = Hecate::AST::Node.missing_from_match(handled)
+puts missing  # => [:var_decl, :block]
+```
+
+See `examples/pattern_matching.cr` for an even more comprehensive example that demonstrates all these features in action.
 
 ## Integration with Visitors
 

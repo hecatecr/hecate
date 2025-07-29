@@ -47,10 +47,10 @@ module DynamicASTExample
 
     # Finalize AST to generate visitors and type predicates
     finalize_ast IntLit, FloatLit, BoolLit, StringLit,
-                 Add, Sub, Mul, Div,
-                 Eq, Lt,
-                 And, Or, Not,
-                 Var, Let, If
+      Add, Sub, Mul, Div,
+      Eq, Lt,
+      And, Or, Not,
+      Var, Let, If
   end
 
   # Example visitor: Pretty printer
@@ -218,7 +218,7 @@ module DynamicASTExample
     private def infer_numeric_op(left : AST::Expr, right : AST::Expr) : Symbol
       left_type = visit(left)
       right_type = visit(right)
-      
+
       if left_type == :float || right_type == :float
         :float
       elsif left_type == :int && right_type == :int
@@ -297,7 +297,7 @@ module DynamicASTExample
 
     def visit_if(node : AST::If) : AST::Expr
       cond = visit(node.cond)
-      
+
       # If condition is constant, we can simplify
       if cond.is_a?(AST::BoolLit)
         if cond.value
@@ -370,27 +370,27 @@ def main
   ]
 
   puts "=== Dynamic AST Example ==="
-  
+
   examples.each_with_index do |expr, i|
     puts "\n--- Example #{i + 1} ---"
-    
+
     # Pretty print
     printer = DynamicASTExample::PrettyPrinter.new
     puts "Expression: #{printer.visit(expr)}"
-    
+
     # Pattern matching
     puts "Node type: #{expr.node_type_symbol}"
     puts "Is binary op? #{expr.is_a?(DynamicASTExample::AST::Add) || expr.is_a?(DynamicASTExample::AST::Sub)}"
-    
+
     # Type inference
     inferer = DynamicASTExample::TypeInferer.new
     inferred_type = inferer.visit(expr)
     puts "Inferred type: #{inferred_type}"
-    
+
     # Constant folding
     folder = DynamicASTExample::ConstantFolder.new
     folded = folder.visit(expr)
-    
+
     if folded != expr
       puts "After folding: #{printer.visit(folded)}"
     end
@@ -407,9 +407,9 @@ def main
     :add, :sub, :mul, :div,
     :eq, :lt,
     :and, :or, :not,
-    :var, :let, :if_
+    :var, :let, :if_,
   ]
-  
+
   missing = Hecate::AST::Node.missing_from_match(handled_types)
   if missing.empty?
     puts "✓ All node types handled"
@@ -420,18 +420,18 @@ def main
   # Pattern matching with case expression
   puts "\n=== Pattern Matching with Case ==="
   expr = examples.first
-  
+
   description = case expr
-  when DynamicASTExample::AST::IntLit
-    "Integer literal: #{expr.value}"
-  when DynamicASTExample::AST::Add
-    "Addition expression"
-  when DynamicASTExample::AST::Let
-    "Let binding for variable '#{expr.name}'"
-  else
-    "Other expression"
-  end
-  
+                when DynamicASTExample::AST::IntLit
+                  "Integer literal: #{expr.value}"
+                when DynamicASTExample::AST::Add
+                  "Addition expression"
+                when DynamicASTExample::AST::Let
+                  "Let binding for variable '#{expr.name}'"
+                else
+                  "Other expression"
+                end
+
   puts description
 end
 

@@ -60,7 +60,7 @@ module StaticASTExample
     property return_type : TypeAnnotation?
     property body : Block
 
-    def initialize(@span : Hecate::Core::Span, @name : String, @params : Array(Parameter), 
+    def initialize(@span : Hecate::Core::Span, @name : String, @params : Array(Parameter),
                    @return_type : TypeAnnotation?, @body : Block)
     end
 
@@ -75,7 +75,7 @@ module StaticASTExample
     property superclass : String?
     property members : Array(ClassMember)
 
-    def initialize(@span : Hecate::Core::Span, @name : String, 
+    def initialize(@span : Hecate::Core::Span, @name : String,
                    @superclass : String?, @members : Array(ClassMember))
     end
 
@@ -93,7 +93,7 @@ module StaticASTExample
     property type : TypeAnnotation
     property initial_value : Expr?
 
-    def initialize(@span : Hecate::Core::Span, @name : String, 
+    def initialize(@span : Hecate::Core::Span, @name : String,
                    @type : TypeAnnotation, @initial_value : Expr? = nil)
     end
 
@@ -271,7 +271,7 @@ module StaticASTExample
       @output << ("  " * @indent + text)
     end
 
-    private def indent
+    private def indent(&)
       @indent += 1
       yield
       @indent -= 1
@@ -295,7 +295,7 @@ module StaticASTExample
       params = node.params.map do |p|
         "#{p.name}: #{p.type.name}"
       end.join(", ")
-      
+
       return_type = node.return_type ? " -> #{node.return_type.name}" : ""
       write("function #{node.name}(#{params})#{return_type} {")
       indent { node.body.accept(self) }
@@ -320,7 +320,7 @@ module StaticASTExample
       params = node.params.map do |p|
         "#{p.name}: #{p.type.name}"
       end.join(", ")
-      
+
       return_type = node.return_type ? " -> #{node.return_type.name}" : ""
       write("method #{node.name}(#{params})#{return_type} {")
       indent { node.body.accept(self) }
@@ -480,10 +480,10 @@ def main
   # This represents a simple program:
   #
   # import std.io
-  # 
+  #
   # class Calculator {
   #   field result: int
-  #   
+  #
   #   method add(a: int, b: int) -> int {
   #     return a + b
   #   }
@@ -500,7 +500,7 @@ def main
   program = StaticASTExample::Program.new(
     dummy_span,
     imports: [
-      StaticASTExample::Import.new(dummy_span, "std.io")
+      StaticASTExample::Import.new(dummy_span, "std.io"),
     ],
     declarations: [
       # Calculator class
@@ -509,41 +509,41 @@ def main
         "Calculator",
         nil, # no superclass
         [
-          # Field
-          StaticASTExample::Field.new(
-            dummy_span,
-            "result",
-            int_type,
-            StaticASTExample::IntegerLiteral.new(dummy_span, 0_i64)
-          ),
-          
-          # Method
-          StaticASTExample::Method.new(
-            dummy_span,
-            "add",
-            [
-              StaticASTExample::Parameter.new(dummy_span, "a", int_type),
-              StaticASTExample::Parameter.new(dummy_span, "b", int_type)
-            ],
-            int_type, # return type
-            StaticASTExample::Block.new(
+        # Field
+        StaticASTExample::Field.new(
+          dummy_span,
+          "result",
+          int_type,
+          StaticASTExample::IntegerLiteral.new(dummy_span, 0_i64)
+        ),
+
+        # Method
+        StaticASTExample::Method.new(
+          dummy_span,
+          "add",
+          [
+            StaticASTExample::Parameter.new(dummy_span, "a", int_type),
+            StaticASTExample::Parameter.new(dummy_span, "b", int_type),
+          ],
+          int_type, # return type
+          StaticASTExample::Block.new(
+          dummy_span,
+          [
+            StaticASTExample::Return.new(
               dummy_span,
-              [
-                StaticASTExample::Return.new(
-                  dummy_span,
-                  StaticASTExample::BinaryOp.new(
-                    dummy_span,
-                    StaticASTExample::Identifier.new(dummy_span, "a"),
-                    "+",
-                    StaticASTExample::Identifier.new(dummy_span, "b")
-                  )
-                )
-              ]
-            )
-          )
-        ]
+              StaticASTExample::BinaryOp.new(
+                dummy_span,
+                StaticASTExample::Identifier.new(dummy_span, "a"),
+                "+",
+                StaticASTExample::Identifier.new(dummy_span, "b")
+              )
+            ),
+          ]
+        )
+        ),
+      ]
       ),
-      
+
       # Main function
       StaticASTExample::FunctionDecl.new(
         dummy_span,
@@ -551,27 +551,27 @@ def main
         [] of StaticASTExample::Parameter,
         nil, # no return type
         StaticASTExample::Block.new(
-          dummy_span,
-          [
-            StaticASTExample::ExprStmt.new(
+        dummy_span,
+        [
+          StaticASTExample::ExprStmt.new(
+            dummy_span,
+            StaticASTExample::Call.new(
               dummy_span,
-              StaticASTExample::Call.new(
-                dummy_span,
-                StaticASTExample::Identifier.new(dummy_span, "calc.add"),
-                [
-                  StaticASTExample::IntegerLiteral.new(dummy_span, 10_i64),
-                  StaticASTExample::IntegerLiteral.new(dummy_span, 20_i64)
-                ]
-              )
+              StaticASTExample::Identifier.new(dummy_span, "calc.add"),
+              [
+                StaticASTExample::IntegerLiteral.new(dummy_span, 10_i64),
+                StaticASTExample::IntegerLiteral.new(dummy_span, 20_i64),
+              ]
             )
-          ]
-        )
+          ),
+        ]
       )
+      ),
     ]
   )
 
   puts "=== Static AST Example ==="
-  
+
   # Pretty print the AST
   puts "\n--- Pretty Printed Program ---"
   printer = StaticASTExample::PrettyPrinter.new
@@ -588,7 +588,7 @@ def main
   puts "\n--- Type Safety ---"
   puts "Program has #{program.imports.size} imports"
   puts "Program has #{program.declarations.size} declarations"
-  
+
   program.declarations.each do |decl|
     case decl
     when StaticASTExample::ClassDecl
@@ -602,12 +602,12 @@ def main
   puts "\n--- AST Node Information ---"
   puts "Root span: #{program.span}"
   puts "Node class: #{program.class}"
-  
+
   # Find specific nodes
   if first_class = program.declarations.find(&.is_a?(StaticASTExample::ClassDecl))
     class_decl = first_class.as(StaticASTExample::ClassDecl)
     puts "\nFirst class: #{class_decl.name}"
-    
+
     if first_method = class_decl.members.find(&.is_a?(StaticASTExample::Method))
       method = first_method.as(StaticASTExample::Method)
       puts "  First method: #{method.name}"

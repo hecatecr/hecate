@@ -63,13 +63,12 @@ describe Hecate::Lex::Token do
       token.lexeme(source_map).should eq("world")
     end
 
-    pending "handles UTF-8 characters correctly" do
-      # TODO: Fix SourceFile UTF-8 handling bug in hecate-core
-      # source_map = Hecate::Core::SourceMap.new
-      # source_id = source_map.add_file("test.txt", "café")
-      # token_span = Hecate::Core::Span.new(source_id, 0, 5)
-      # token = Hecate::Lex::Token.new(TestTokenKind::Identifier, token_span)
-      # token.lexeme(source_map).should eq("café")
+    it "handles UTF-8 characters correctly" do
+      source_map = Hecate::Core::SourceMap.new
+      source_id = source_map.add_file("test.txt", "café")
+      token_span = Hecate::Core::Span.new(source_id, 0, 5)
+      token = Hecate::Lex::Token.new(TestTokenKind::Identifier, token_span)
+      token.lexeme(source_map).should eq("café")
     end
 
     it "falls back to stored value when source is missing" do

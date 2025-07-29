@@ -98,10 +98,7 @@ describe Hecate::AST::Macros do
       node.children.should eq([left, right])
     end
 
-    pending "handles optional node fields" do
-      # Known limitation: Optional node field detection needs improvement
-      # The macro system doesn't properly detect optional node types when
-      # they're declared as Type? due to how Crystal expands the type
+    it "handles optional node fields" do
       span = Hecate::Core::Span.new(0_u32, 0, 10)
 
       # Without value
@@ -191,9 +188,7 @@ describe Hecate::AST::Macros do
       clone.right.should_not be(right) # Deep clone
     end
 
-    pending "clones optional fields" do
-      # Known limitation: Optional node field cloning needs improvement
-      # Related to the same issue with optional field detection
+    it "clones optional fields" do
       span = Hecate::Core::Span.new(0_u32, 0, 10)
       value = TestAST::IntLit.new(span, 42)
       node = TestAST::VarDecl.new(span, "x", value)
